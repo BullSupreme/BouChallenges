@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disney Songs Challenge - Bou Challenges</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
+                <a href="../index.html" class="back-button">← Back Home</a>
+                <div style="display: flex; gap: 10px;">
+                    <button id="importBtn" class="btn btn-primary">Import HTML</button>
+                    <button id="exportBtn" class="btn btn-primary">Export as HTML</button>
+                </div>
+            </div>
+            <input type="file" id="importFileInput" accept=".html" style="display: none;">
+        </header>
+
+        <main>
+            <section class="challenge-section">
+                <div class="songs-list">
+                    <h2>Top Disney Songs</h2>
+                    <div id="songsList" class="songs-container">
+                        <!-- Rankings will be generated here -->
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button id="addRankBtn" class="btn btn-primary">+ Add Rank</button>
+                        <button id="removeRankBtn" class="btn btn-remove">- Remove Rank</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Created by a Bou for a Bou | Made with ❤️</p>
+        </footer>
+    </div>
+
+    <script src="../js/ranking-manager.js"></script>
+    <script>
+        // Create a specialized version for Disney Songs using the generic RankingManager
+        // This keeps the Disney-specific storage key intact
+        class DisneyManager extends RankingManager {
+            constructor() {
+                super('disneysSongs', 'songs');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new DisneyManager();
+        });
+    </script>
+</body>
+</html>
