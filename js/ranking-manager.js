@@ -84,7 +84,7 @@ class RankingManager {
         return {
             platform: 'YouTube',
             title: title,
-            artist: 'Artist Name',
+            artist: '',
             thumbnailUrl: thumbnailUrl,
             url: url,
             videoId: videoId,
