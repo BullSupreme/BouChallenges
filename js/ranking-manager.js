@@ -53,6 +53,7 @@ class RankingManager {
         const patterns = [
             /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
             /youtube\.com\/embed\/([^&\n?#]+)/,
+            /youtube\.com\/shorts\/([^&\n?#]+)/,
         ];
 
         for (const pattern of patterns) {
@@ -97,44 +98,7 @@ class RankingManager {
 
             const trackId = trackIdMatch[1];
 
-            // Try using Spotify's public API endpoint (no authentication required)
-            try {
-                const apiResponse = await fetch(`https://open.spotify.com/api/track/${trackId}`);
-                if (apiResponse.ok) {
-                    const apiData = await apiResponse.json();
-                    let title = 'Spotify Track';
-                    let artist = 'Unknown Artist';
-                    let thumbnail = null;
-
-                    // Extract title from API response
-                    if (apiData.name) {
-                        title = apiData.name.trim();
-                    }
-
-                    // Extract artist from API response
-                    if (apiData.artists && apiData.artists.length > 0) {
-                        artist = apiData.artists[0].name.trim();
-                    }
-
-                    // Extract thumbnail
-                    if (apiData.images && apiData.images.length > 0) {
-                        thumbnail = apiData.images[0].url;
-                    }
-
-                    return {
-                        platform: 'Spotify',
-                        title: title,
-                        artist: artist,
-                        thumbnailUrl: thumbnail || this.getSpotifyDefaultThumbnail(trackId),
-                        url: url,
-                        trackId: trackId,
-                    };
-                }
-            } catch (apiError) {
-                // Fall through to oEmbed fallback
-            }
-
-            // Fallback to oEmbed if API call fails
+            // Use Spotify's oEmbed endpoint which provides title and thumbnail
             const response = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(url)}`);
 
             if (!response.ok) {
@@ -145,8 +109,44 @@ class RankingManager {
             let title = 'Spotify Track';
             let artist = 'Unknown Artist';
 
+            // Extract title from the data.title field
             if (data.title) {
                 title = data.title.trim();
+            }
+
+            // Try using a CORS proxy to fetch the embed page
+            // Using allOrigins as a free CORS proxy
+            try {
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://open.spotify.com/embed/track/${trackId}`)}`;
+                const proxyResponse = await fetch(proxyUrl);
+
+                if (proxyResponse.ok) {
+                    const embedHtml = await proxyResponse.text();
+
+                    // Try to find data in Next.js pageProps
+                    // Look for pattern: "name":"Song Name" followed by artist data
+                    const nameMatch = embedHtml.match(/"name":"([^"]+)","uri":"spotify:track:[^"]+"/);
+                    if (nameMatch && nameMatch[1]) {
+                        title = nameMatch[1];
+                    }
+
+                    // Look for artist information in the artists items array
+                    const artistMatch = embedHtml.match(/"artists":\{"items":\[\{"uri":"[^"]+","profile":\{"name":"([^"]+)"/);
+                    if (artistMatch && artistMatch[1]) {
+                        artist = artistMatch[1];
+                    }
+
+                    // Alternative pattern: look for simpler artist name structure
+                    if (artist === 'Unknown Artist') {
+                        const altArtistMatch = embedHtml.match(/"profile":\{"name":"([^"]+)"/);
+                        if (altArtistMatch && altArtistMatch[1]) {
+                            artist = altArtistMatch[1];
+                        }
+                    }
+                }
+            } catch (proxyError) {
+                // If proxy parsing fails, continue with what we have from oEmbed
+                console.log('Proxy fetch failed, using oEmbed data only:', proxyError);
             }
 
             return {
@@ -158,6 +158,7 @@ class RankingManager {
                 trackId: trackId,
             };
         } catch (error) {
+            console.error('Spotify data fetch error:', error);
             return this.getSpotifyFallback(url);
         }
     }
@@ -204,13 +205,17 @@ class RankingManager {
             .join('');
 
         // Add event listeners to URL input fields
-        document.querySelectorAll('.song-url-input').forEach((input, index) => {
+        document.querySelectorAll('.song-url-input').forEach((input) => {
             input.addEventListener('change', async (e) => {
                 const url = e.target.value.trim();
                 if (url) {
                     try {
+                        // Find the correct index from the parent song-item
+                        const songItem = e.target.closest('.song-item');
+                        const actualIndex = parseInt(songItem.dataset.itemIndex);
+
                         const itemData = await this.parseItemFromURL(url);
-                        this.items[index] = { ...this.items[index], ...itemData, url: url };
+                        this.items[actualIndex] = { ...this.items[actualIndex], ...itemData, url: url };
                         this.saveItems();
                         this.renderItems();
                     } catch (error) {
@@ -278,6 +283,100 @@ class RankingManager {
                 }
             });
         });
+
+        // Add event listeners to thumbnail play buttons
+        document.querySelectorAll('.thumbnail-play-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const index = parseInt(e.target.dataset.index);
+                this.playItem(index);
+            });
+        });
+
+        // Add event listeners to external link buttons
+        document.querySelectorAll('.external-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                this.openExternal(index);
+            });
+        });
+    }
+
+    playItem(index) {
+        const item = this.items[index];
+        if (!item.url) return;
+
+        // Find the thumbnail wrapper for this item
+        const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${index}"]`);
+        if (!thumbnailWrapper) return;
+
+        // Check if already playing - if so, restore thumbnail
+        if (thumbnailWrapper.classList.contains('playing')) {
+            // Restore the thumbnail
+            thumbnailWrapper.innerHTML = `
+                <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%2394a3b8%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+                <button class="thumbnail-play-btn" data-index="${index}">▶</button>
+            `;
+            thumbnailWrapper.classList.remove('playing');
+
+            // Re-attach event listener to the new play button
+            const playBtn = thumbnailWrapper.querySelector('.thumbnail-play-btn');
+            playBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.playItem(index);
+            });
+            return;
+        }
+
+        // Embed player based on platform
+        let playerHtml = '';
+        if (item.platform === 'YouTube') {
+            const videoId = item.videoId || this.extractYouTubeId(item.url);
+            playerHtml = `
+                <iframe
+                    width="100%"
+                    height="100%"
+                    src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                    style="border-radius: 5px; aspect-ratio: 1;">
+                </iframe>
+            `;
+        } else if (item.platform === 'Spotify') {
+            const trackId = item.trackId || this.extractSpotifyId(item.url);
+            playerHtml = `
+                <iframe
+                    style="border-radius: 5px; width: 100%; aspect-ratio: 1;"
+                    src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator"
+                    frameBorder="0"
+                    allowfullscreen=""
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy">
+                </iframe>
+            `;
+        }
+
+        // Replace thumbnail with player
+        thumbnailWrapper.innerHTML = playerHtml;
+        thumbnailWrapper.classList.add('playing');
+    }
+
+    extractYouTubeId(url) {
+        // Reuse the getYouTubeVideoId method for consistency
+        return this.getYouTubeVideoId(url);
+    }
+
+    extractSpotifyId(url) {
+        const match = url.match(/track\/([a-zA-Z0-9]+)/);
+        return match ? match[1] : null;
+    }
+
+    openExternal(index) {
+        const item = this.items[index];
+        if (item.url) {
+            window.open(item.url, '_blank');
+        }
     }
 
     addRank() {
@@ -331,17 +430,6 @@ class RankingManager {
 
             this.saveItems();
             this.renderItems();
-
-            setTimeout(() => {
-                const items = document.querySelectorAll('.song-item');
-                if (items[index - 1]) items[index - 1].classList.add('animate-swap-down');
-                if (items[index]) items[index].classList.add('animate-swap-up');
-
-                setTimeout(() => {
-                    if (items[index - 1]) items[index - 1].classList.remove('animate-swap-down');
-                    if (items[index]) items[index].classList.remove('animate-swap-up');
-                }, 400);
-            }, 10);
         }
     }
 
@@ -354,17 +442,6 @@ class RankingManager {
 
             this.saveItems();
             this.renderItems();
-
-            setTimeout(() => {
-                const items = document.querySelectorAll('.song-item');
-                if (items[index]) items[index].classList.add('animate-swap-down');
-                if (items[index + 1]) items[index + 1].classList.add('animate-swap-up');
-
-                setTimeout(() => {
-                    if (items[index]) items[index].classList.remove('animate-swap-down');
-                    if (items[index + 1]) items[index + 1].classList.remove('animate-swap-up');
-                }, 400);
-            }, 10);
         }
     }
 
@@ -373,17 +450,66 @@ class RankingManager {
         const canMoveUp = index > 0;
         const canMoveDown = index < this.items.length - 1;
 
+        // Check if this is a Spotify track with a URL
+        const hasUrl = item.url && item.url.trim() !== '';
+        const isSpotify = item.platform === 'Spotify' && hasUrl;
+
+        // If Spotify, show full embed layout
+        if (isSpotify) {
+            const trackId = item.trackId || this.extractSpotifyId(item.url);
+            return `
+                <div class="song-item song-item-spotify ${rankColor}" data-item-index="${index}">
+                    <div class="rank-controls">
+                        <button class="rank-arrow up-arrow" data-index="${index}" ${!canMoveUp ? 'disabled' : ''}>▲</button>
+                        <div class="song-rank">#${item.rank}</div>
+                        <button class="rank-arrow down-arrow" data-index="${index}" ${!canMoveDown ? 'disabled' : ''}>▼</button>
+                    </div>
+                    <div class="spotify-embed-wrapper">
+                        <iframe
+                            style="border-radius: 12px"
+                            src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator"
+                            width="100%"
+                            height="152"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                    <button class="remove-btn" data-index="${index}">×</button>
+                </div>
+            `;
+        }
+
+        // For YouTube or empty items, use the standard layout
+        const displayText = item.title && item.artist && item.artist !== 'Unknown Artist'
+            ? `${item.title} - ${item.artist}`
+            : item.title || 'Add your item';
+
+        const externalButton = hasUrl ? `<button class="external-btn" data-index="${index}" title="Open in new tab">↗</button>` : '';
+
+        const thumbnailHtml = hasUrl ? `
+            <div class="thumbnail-wrapper" data-index="${index}">
+                <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%2394a3b8%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+                <button class="thumbnail-play-btn" data-index="${index}">▶</button>
+            </div>
+        ` : `
+            <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%2394a3b8%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+        `;
+
         return `
-            <div class="song-item ${rankColor}">
+            <div class="song-item ${rankColor}" data-item-index="${index}">
                 <div class="rank-controls">
                     <button class="rank-arrow up-arrow" data-index="${index}" ${!canMoveUp ? 'disabled' : ''}>▲</button>
                     <div class="song-rank">#${item.rank}</div>
                     <button class="rank-arrow down-arrow" data-index="${index}" ${!canMoveDown ? 'disabled' : ''}>▼</button>
                 </div>
-                <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%2394a3b8%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+                ${thumbnailHtml}
                 <div class="song-info">
-                    <div class="song-title-display">${this.escapeHtml(item.title || 'Add your item')}</div>
-                    <div class="song-artist-display">${this.escapeHtml(item.artist || '')}</div>
+                    <div class="song-title-display">
+                        ${this.escapeHtml(displayText)}
+                        ${externalButton}
+                    </div>
                     <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}">
                 </div>
                 <button class="remove-btn" data-index="${index}">×</button>
@@ -418,19 +544,47 @@ class RankingManager {
                 const rankText = element.querySelector('.song-rank')?.textContent || '';
                 const rank = parseInt(rankText.replace('#', '')) || importedItems.length + 1;
 
-                const title = element.querySelector('.song-title')?.textContent || '';
-                const artist = element.querySelector('.song-artist')?.textContent || '';
-                const platform = element.querySelector('.song-platform')?.textContent || '';
-                const thumbnailUrl = element.querySelector('.song-thumbnail')?.src || '';
+                // Check if this is a Spotify embed
+                const spotifyIframe = element.querySelector('.spotify-embed-wrapper iframe');
+                let url = '';
+                let trackId = '';
+                let videoId = '';
+                let platform = '';
+                let title = '';
+                let artist = '';
+                let thumbnailUrl = '';
 
-                if (title) {
+                if (spotifyIframe) {
+                    // Spotify embed import
+                    platform = 'Spotify';
+                    const src = spotifyIframe.getAttribute('src') || '';
+                    const trackMatch = src.match(/track\/([a-zA-Z0-9]+)/);
+                    if (trackMatch) {
+                        trackId = trackMatch[1];
+                        url = `https://open.spotify.com/track/${trackId}`;
+                    }
+                    // For Spotify, we'll need to re-fetch metadata when URL is loaded
+                    title = 'Spotify Track'; // Placeholder
+                    artist = 'Unknown Artist';
+                    thumbnailUrl = '';
+                } else {
+                    // Regular YouTube/other item import
+                    title = element.querySelector('.song-title')?.textContent || '';
+                    artist = element.querySelector('.song-artist')?.textContent || '';
+                    platform = element.querySelector('.song-platform')?.textContent || '';
+                    thumbnailUrl = element.querySelector('.song-thumbnail')?.src || '';
+                }
+
+                if (title || url) {
                     importedItems.push({
                         rank: rank,
                         title: title,
                         artist: artist,
                         platform: platform,
                         thumbnailUrl: thumbnailUrl,
-                        url: ''
+                        url: url,
+                        trackId: trackId || undefined,
+                        videoId: videoId || undefined
                     });
                 }
             });
@@ -525,6 +679,12 @@ class RankingManager {
             border-radius: 10px;
             border: 2px solid #334155;
         }
+        .song-item-spotify {
+            grid-template-columns: 60px 1fr;
+        }
+        .spotify-embed-wrapper {
+            width: 100%;
+        }
         .song-rank {
             font-size: 1.8em;
             font-weight: 800;
@@ -596,7 +756,30 @@ class RankingManager {
                   item.rank === 1 ? 'rank-gold' :
                   item.rank === 2 ? 'rank-silver' :
                   item.rank === 3 ? 'rank-bronze' : '';
-                return `
+
+                // Check if this is a Spotify track
+                const isSpotify = item.platform === 'Spotify' && item.url;
+
+                if (isSpotify) {
+                  const trackId = item.trackId || this.extractSpotifyId(item.url);
+                  return `
+            <div class="song-item song-item-spotify ${rankClass}">
+                <div class="song-rank">#${item.rank}</div>
+                <div class="spotify-embed-wrapper">
+                    <iframe
+                        style="border-radius: 12px"
+                        src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator"
+                        width="100%"
+                        height="152"
+                        frameBorder="0"
+                        allowfullscreen=""
+                        allow="clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </div>`;
+                } else {
+                  return `
             <div class="song-item ${rankClass}">
                 <div class="song-rank">#${item.rank}</div>
                 <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
@@ -606,6 +789,7 @@ class RankingManager {
                     <div class="song-platform">${item.platform}</div>
                 </div>
             </div>`;
+                }
               })
               .join('')}
         </div>
@@ -620,17 +804,21 @@ class RankingManager {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'Rankings.html';
+
+        // Generate dynamic filename from the page title (h2 element)
+        const pageTitleElement = document.querySelector('.songs-list h2');
+        let filename = 'Rankings.html';
+        if (pageTitleElement) {
+            // Get the text content and format it for a filename
+            // e.g., "Top Disney Songs" -> "TopDisneySongs.html"
+            const pageTitle = pageTitleElement.textContent.trim();
+            filename = pageTitle.replace(/\s+/g, '') + '.html';
+        }
+        a.download = filename;
+
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     }
 }
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    // Create instance with your specific storage key and challenge type
-    // Example: new RankingManager('disneysSongs', 'songs');
-    new RankingManager('rankingData', 'generic');
-});

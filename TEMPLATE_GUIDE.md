@@ -10,11 +10,20 @@ The system is built with a modular approach:
 - **`ranking-manager.js`**: Generic JavaScript class that handles all ranking logic
 - **Challenge-specific setup**: Each challenge can customize the storage key and challenge type
 
+## Recent Features (Latest Updates)
+
+- ✅ **YouTube Shorts Support**: Now supports `youtube.com/shorts/` URLs
+- ✅ **Spotify Full Embed**: Spotify tracks display as full interactive embeds (no separate thumbnail)
+- ✅ **Inline Playback**: YouTube videos play inline when clicking thumbnail (no modal popup)
+- ✅ **Import/Export Compatibility**: Import and export now support both YouTube and Spotify formats
+- ✅ **Dynamic Export Filenames**: Export filename automatically matches page title (e.g., "Top Disney Songs" → `TopDisneySongs.html`)
+- ✅ **No Swap Animations**: Rank swapping happens instantly without animation delay
+
 ## Creating a New Challenge
 
 ### Step 1: Create a New HTML File
 
-Copy `challenge-template.html` and rename it to your challenge name (e.g., `anime-rankings.html`):
+Copy `pages/challenge-template.html` and rename it to your challenge name (e.g., `pages/anime-rankings.html`):
 
 ```html
 <!DOCTYPE html>
@@ -58,6 +67,7 @@ Copy `challenge-template.html` and rename it to your challenge name (e.g., `anim
         </footer>
     </div>
 
+    <script src="../js/ranking-manager.js"></script>
     <script>
         // Create a specialized manager for your challenge
         class AnimeManager extends RankingManager {
@@ -70,7 +80,6 @@ Copy `challenge-template.html` and rename it to your challenge name (e.g., `anim
             new AnimeManager();
         });
     </script>
-    <script src="../js/ranking-manager.js"></script>
 </body>
 </html>
 ```
@@ -153,14 +162,17 @@ All styling is in `css/styles.css`. The following CSS classes are used:
 Each challenge automatically includes:
 
 - ✅ 5 default empty ranking slots
-- ✅ YouTube and Spotify URL support with auto-metadata extraction
-- ✅ Rank reordering with smooth animations
+- ✅ YouTube (including Shorts) and Spotify URL support with auto-metadata extraction
+- ✅ Spotify tracks display as full interactive embeds
+- ✅ YouTube inline playback (click thumbnail to play)
+- ✅ Instant rank reordering (no animations)
 - ✅ Add/remove ranking slots
 - ✅ Clear individual items
-- ✅ Import/export functionality
+- ✅ Import/export functionality (supports both platforms)
 - ✅ Dark mode with purple and pink accents
 - ✅ Persistent storage (localStorage)
 - ✅ Responsive design
+- ✅ External link button (↗) to open items in new tab
 
 ## File Structure
 

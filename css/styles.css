@@ -382,6 +382,16 @@ main {
     animation: slide-up 0.6s ease-out;
 }
 
+.song-item-spotify {
+    grid-template-columns: 60px 1fr 40px;
+}
+
+.spotify-embed-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
 .song-item.animate-swap-down {
     animation: swap-down 0.4s ease-in-out;
 }
@@ -486,14 +496,31 @@ main {
     font-size: 1em;
     font-weight: 600;
     color: var(--text-dark);
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.song-artist-display {
-    font-size: 0.9em;
-    font-weight: 400;
-    color: var(--text-light);
-    margin-bottom: 8px;
+.external-btn {
+    background: linear-gradient(135deg, #06b6d4 0%, #a855f7 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.75em;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.external-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
 }
 
 .song-url-input {
@@ -525,6 +552,44 @@ main {
     border-radius: 5px;
     object-fit: cover;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.thumbnail-wrapper {
+    position: relative;
+    width: 100%;
+    cursor: pointer;
+}
+
+.thumbnail-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.2em;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 3px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.thumbnail-wrapper:hover .thumbnail-play-btn {
+    opacity: 1;
+}
+
+.thumbnail-play-btn:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
 }
 
 .song-info {
@@ -641,6 +706,10 @@ footer {
     .song-item {
         grid-template-columns: 40px 70px 1fr;
         gap: 15px;
+    }
+
+    .song-item-spotify {
+        grid-template-columns: 40px 1fr;
     }
 
     .song-rank {
