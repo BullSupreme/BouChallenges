@@ -15,10 +15,11 @@ The system is built with a modular approach:
 - ✅ **YouTube Shorts Support**: Now supports `youtube.com/shorts/` URLs
 - ✅ **Spotify Full Embed**: Spotify tracks display as full interactive embeds (no separate thumbnail)
 - ✅ **Inline Playback**: YouTube videos play inline when clicking thumbnail (no modal popup)
+- ✅ **YouTube 2x Scaling**: YouTube videos zoom to 2x size when playing for better visibility
 - ✅ **Import/Export Compatibility**: Import and export now support both YouTube and Spotify formats
 - ✅ **Dynamic Export Filenames**: Export filename automatically matches page title (e.g., "Top Disney Songs" → `TopDisneySongs.html`)
 - ✅ **No Swap Animations**: Rank swapping happens instantly without animation delay
-- ✅ **Drag & Drop Reordering**: Drag and drop ranking items to reorder them with visual feedback
+- ✅ **Drag & Drop Reordering**: Drag and drop ranking items to reorder them with auto-scroll support
 
 ## Creating a New Challenge
 
@@ -166,8 +167,9 @@ Each challenge automatically includes:
 - ✅ YouTube (including Shorts) and Spotify URL support with auto-metadata extraction
 - ✅ Spotify tracks display as full interactive embeds
 - ✅ YouTube inline playback (click thumbnail to play)
+- ✅ YouTube videos scale to 2x size when playing
 - ✅ Instant rank reordering (no animations)
-- ✅ Drag and drop reordering (click and drag items to reorder)
+- ✅ Drag and drop reordering with auto-scroll when dragging near edges
 - ✅ Add/remove ranking slots
 - ✅ Clear individual items
 - ✅ Import/export functionality (supports both platforms)
