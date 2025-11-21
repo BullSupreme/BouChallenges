@@ -301,8 +301,19 @@ class RankingManager {
             });
         });
 
-        // Add drag and drop functionality
+        // Add drag and drop functionality with auto-scroll
         let draggedElement = null;
+        let autoScrollInterval = null;
+        const scrollThreshold = 80; // Distance from edge to trigger scroll
+        const scrollSpeed = 5; // Pixels per frame
+
+        const clearAutoScroll = () => {
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+                autoScrollInterval = null;
+            }
+        };
+
         document.querySelectorAll('.song-item').forEach((item) => {
             item.addEventListener('dragstart', (e) => {
                 draggedElement = item;
@@ -313,6 +324,7 @@ class RankingManager {
             item.addEventListener('dragend', (e) => {
                 item.classList.remove('dragging');
                 draggedElement = null;
+                clearAutoScroll();
             });
 
             item.addEventListener('dragover', (e) => {
@@ -320,6 +332,26 @@ class RankingManager {
                 e.dataTransfer.dropEffect = 'move';
                 if (draggedElement && draggedElement !== item) {
                     item.classList.add('drag-over');
+                }
+
+                // Auto-scroll functionality
+                const rect = this.itemsList.getBoundingClientRect();
+                const mouseY = e.clientY;
+
+                clearAutoScroll();
+
+                // Check if near top
+                if (mouseY - rect.top < scrollThreshold && this.itemsList.scrollTop > 0) {
+                    autoScrollInterval = setInterval(() => {
+                        this.itemsList.scrollTop -= scrollSpeed;
+                    }, 16);
+                }
+                // Check if near bottom
+                else if (rect.bottom - mouseY < scrollThreshold &&
+                         this.itemsList.scrollTop < this.itemsList.scrollHeight - this.itemsList.clientHeight) {
+                    autoScrollInterval = setInterval(() => {
+                        this.itemsList.scrollTop += scrollSpeed;
+                    }, 16);
                 }
             });
 
@@ -330,6 +362,7 @@ class RankingManager {
             item.addEventListener('drop', (e) => {
                 e.preventDefault();
                 item.classList.remove('drag-over');
+                clearAutoScroll();
                 if (draggedElement && draggedElement !== item) {
                     const draggedIndex = parseInt(draggedElement.dataset.itemIndex);
                     const targetIndex = parseInt(item.dataset.itemIndex);
