@@ -382,13 +382,18 @@ class RankingManager {
 
         // Check if already playing - if so, restore thumbnail
         if (thumbnailWrapper.classList.contains('playing')) {
+            // Remove the expanded modal/overlay if it exists
+            const expandedPlayer = document.querySelector('.youtube-expanded-player');
+            if (expandedPlayer) {
+                expandedPlayer.remove();
+            }
+
             // Restore the thumbnail
             thumbnailWrapper.innerHTML = `
                 <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%2394a3b8%22%3ENo Image%3C/text%3E%3C/svg%3E'">
                 <button class="thumbnail-play-btn" data-index="${index}">▶</button>
             `;
             thumbnailWrapper.classList.remove('playing');
-            thumbnailWrapper.style.transform = 'scale(1)'; // Reset scale when stopping
 
             // Re-attach event listener to the new play button
             const playBtn = thumbnailWrapper.querySelector('.thumbnail-play-btn');
@@ -400,29 +405,41 @@ class RankingManager {
         }
 
         // Embed player based on platform
-        let playerHtml = '';
         if (item.platform === 'YouTube') {
             const videoId = item.videoId || this.extractYouTubeId(item.url);
-            playerHtml = `
-                <iframe
-                    width="100%"
-                    height="100%"
-                    src="https://www.youtube.com/embed/${videoId}?autoplay=1"
-                    frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                    style="border-radius: 5px; aspect-ratio: 1;">
-                </iframe>
+
+            // Create an expanded player overlay
+            const expandedPlayer = document.createElement('div');
+            expandedPlayer.className = 'youtube-expanded-player';
+            expandedPlayer.innerHTML = `
+                <div class="youtube-expanded-container">
+                    <iframe
+                        width="100%"
+                        height="100%"
+                        src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                        style="border-radius: 5px;">
+                    </iframe>
+                    <button class="youtube-close-btn" data-index="${index}">✕</button>
+                </div>
             `;
-            // Replace thumbnail with player and scale up
-            thumbnailWrapper.innerHTML = playerHtml;
+
+            document.body.appendChild(expandedPlayer);
+
+            // Add close button listener
+            const closeBtn = expandedPlayer.querySelector('.youtube-close-btn');
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.playItem(index);
+            });
+
+            // Mark as playing
             thumbnailWrapper.classList.add('playing');
-            thumbnailWrapper.style.transform = 'scale(2)'; // Scale to 2x for YouTube
-            thumbnailWrapper.style.transformOrigin = 'top left'; // Scale from top-left corner
-            thumbnailWrapper.style.zIndex = '100'; // Bring to front
         } else if (item.platform === 'Spotify') {
             const trackId = item.trackId || this.extractSpotifyId(item.url);
-            playerHtml = `
+            const playerHtml = `
                 <iframe
                     style="border-radius: 5px; width: 100%; aspect-ratio: 1;"
                     src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator"
