@@ -717,12 +717,12 @@ footer {
 
 /* YouTube Expanded Song Item Styles */
 .song-item.youtube-expanded {
-    grid-template-columns: 60px 240px 1fr 40px;
-    gap: 20px;
+    align-items: start;
+}
+
+.song-item.youtube-expanded .thumbnail-wrapper {
     transform: scale(2);
     transform-origin: top left;
-    z-index: 50;
-    position: relative;
 }
 
 /* Responsive */
