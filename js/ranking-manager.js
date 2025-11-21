@@ -388,6 +388,7 @@ class RankingManager {
                 <button class="thumbnail-play-btn" data-index="${index}">▶</button>
             `;
             thumbnailWrapper.classList.remove('playing');
+            thumbnailWrapper.style.transform = 'scale(1)'; // Reset scale when stopping
 
             // Re-attach event listener to the new play button
             const playBtn = thumbnailWrapper.querySelector('.thumbnail-play-btn');
@@ -413,6 +414,12 @@ class RankingManager {
                     style="border-radius: 5px; aspect-ratio: 1;">
                 </iframe>
             `;
+            // Replace thumbnail with player and scale up
+            thumbnailWrapper.innerHTML = playerHtml;
+            thumbnailWrapper.classList.add('playing');
+            thumbnailWrapper.style.transform = 'scale(2)'; // Scale to 2x for YouTube
+            thumbnailWrapper.style.transformOrigin = 'top left'; // Scale from top-left corner
+            thumbnailWrapper.style.zIndex = '100'; // Bring to front
         } else if (item.platform === 'Spotify') {
             const trackId = item.trackId || this.extractSpotifyId(item.url);
             playerHtml = `
@@ -425,11 +432,10 @@ class RankingManager {
                     loading="lazy">
                 </iframe>
             `;
+            // Replace thumbnail with player (no scaling for Spotify)
+            thumbnailWrapper.innerHTML = playerHtml;
+            thumbnailWrapper.classList.add('playing');
         }
-
-        // Replace thumbnail with player
-        thumbnailWrapper.innerHTML = playerHtml;
-        thumbnailWrapper.classList.add('playing');
     }
 
     extractYouTubeId(url) {
