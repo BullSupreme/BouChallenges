@@ -300,6 +300,43 @@ class RankingManager {
                 this.openExternal(index);
             });
         });
+
+        // Add drag and drop functionality
+        let draggedElement = null;
+        document.querySelectorAll('.song-item').forEach((item) => {
+            item.addEventListener('dragstart', (e) => {
+                draggedElement = item;
+                item.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            item.addEventListener('dragend', (e) => {
+                item.classList.remove('dragging');
+                draggedElement = null;
+            });
+
+            item.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (draggedElement && draggedElement !== item) {
+                    item.classList.add('drag-over');
+                }
+            });
+
+            item.addEventListener('dragleave', (e) => {
+                item.classList.remove('drag-over');
+            });
+
+            item.addEventListener('drop', (e) => {
+                e.preventDefault();
+                item.classList.remove('drag-over');
+                if (draggedElement && draggedElement !== item) {
+                    const draggedIndex = parseInt(draggedElement.dataset.itemIndex);
+                    const targetIndex = parseInt(item.dataset.itemIndex);
+                    this.swapItems(draggedIndex, targetIndex);
+                }
+            });
+        });
     }
 
     playItem(index) {
@@ -445,6 +482,20 @@ class RankingManager {
         }
     }
 
+    swapItems(fromIndex, toIndex) {
+        if (fromIndex === toIndex) return;
+
+        // Swap the items
+        [this.items[fromIndex], this.items[toIndex]] = [this.items[toIndex], this.items[fromIndex]];
+
+        // Update ranks for both items
+        this.items[fromIndex].rank = fromIndex + 1;
+        this.items[toIndex].rank = toIndex + 1;
+
+        this.saveItems();
+        this.renderItems();
+    }
+
     createItemElement(item, index) {
         const rankColor = this.getRankColor(item.rank);
         const canMoveUp = index > 0;
@@ -498,7 +549,7 @@ class RankingManager {
         `;
 
         return `
-            <div class="song-item ${rankColor}" data-item-index="${index}">
+            <div class="song-item ${rankColor}" data-item-index="${index}" draggable="true">
                 <div class="rank-controls">
                     <button class="rank-arrow up-arrow" data-index="${index}" ${!canMoveUp ? 'disabled' : ''}>▲</button>
                     <div class="song-rank">#${item.rank}</div>

@@ -697,6 +697,24 @@ footer {
     animation: slide-up 0.3s ease-out;
 }
 
+/* Drag and Drop Styles */
+.song-item.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+.song-item.drag-over {
+    background: linear-gradient(135deg, #2d3f52 0%, #3d4f62 100%);
+    border: 2px solid #a855f7;
+    box-shadow: 0 8px 30px rgba(168, 85, 247, 0.4), inset 0 0 20px rgba(168, 85, 247, 0.1);
+    transform: scaleY(1.05);
+}
+
+.song-item {
+    cursor: grab;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     header h1 {
