@@ -18,6 +18,7 @@ The system is built with a modular approach:
 - ✅ **Import/Export Compatibility**: Import and export now support both YouTube and Spotify formats
 - ✅ **Dynamic Export Filenames**: Export filename automatically matches page title (e.g., "Top Disney Songs" → `TopDisneySongs.html`)
 - ✅ **No Swap Animations**: Rank swapping happens instantly without animation delay
+- ✅ **Drag & Drop Reordering**: Drag and drop ranking items to reorder them with visual feedback
 
 ## Creating a New Challenge
 
@@ -166,6 +167,7 @@ Each challenge automatically includes:
 - ✅ Spotify tracks display as full interactive embeds
 - ✅ YouTube inline playback (click thumbnail to play)
 - ✅ Instant rank reordering (no animations)
+- ✅ Drag and drop reordering (click and drag items to reorder)
 - ✅ Add/remove ranking slots
 - ✅ Clear individual items
 - ✅ Import/export functionality (supports both platforms)
