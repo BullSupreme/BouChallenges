@@ -7,6 +7,7 @@ class RankingManager {
         this.challengeType = challengeType;
         this.items = JSON.parse(localStorage.getItem(this.storageKey)) || this.initializeDefaults();
         this.itemsList = document.getElementById('songsList');
+        this.playingVideoIndex = null; // Track which item has video playing
         this.init();
     }
 
@@ -370,6 +371,39 @@ class RankingManager {
                 }
             });
         });
+
+        // Restore playing video if one was active
+        if (this.playingVideoIndex !== null) {
+            const playingItem = this.items[this.playingVideoIndex];
+            if (playingItem && playingItem.platform === 'YouTube') {
+                // Wait a tick for DOM to be ready, then re-attach the video
+                setTimeout(() => {
+                    const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${this.playingVideoIndex}"]`);
+                    if (thumbnailWrapper) {
+                        const videoId = playingItem.videoId || this.extractYouTubeId(playingItem.url);
+                        const playerHtml = `
+                            <iframe
+                                width="100%"
+                                height="100%"
+                                src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                style="border-radius: 5px; aspect-ratio: 1;">
+                            </iframe>
+                        `;
+                        thumbnailWrapper.innerHTML = playerHtml;
+                        thumbnailWrapper.classList.add('playing');
+
+                        // Add the expanded class to the song-item
+                        const songItem = thumbnailWrapper.closest('.song-item');
+                        if (songItem) {
+                            songItem.classList.add('youtube-expanded');
+                        }
+                    }
+                }, 0);
+            }
+        }
     }
 
     playItem(index) {
@@ -394,6 +428,9 @@ class RankingManager {
             if (songItem) {
                 songItem.classList.remove('youtube-expanded');
             }
+
+            // Clear the tracking variable
+            this.playingVideoIndex = null;
 
             // Re-attach event listener to the new play button
             const playBtn = thumbnailWrapper.querySelector('.thumbnail-play-btn');
@@ -422,6 +459,9 @@ class RankingManager {
             // Replace thumbnail with player
             thumbnailWrapper.innerHTML = playerHtml;
             thumbnailWrapper.classList.add('playing');
+
+            // Track that this video is playing
+            this.playingVideoIndex = index;
 
             // Get the song-item and add scaling class
             const songItem = thumbnailWrapper.closest('.song-item');
