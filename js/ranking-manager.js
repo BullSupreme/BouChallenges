@@ -201,18 +201,34 @@ class RankingManager {
     }
 
     renderItems() {
-        // Check if a video is currently playing
+        // Check if a video is currently playing and preserve its iframe
         const playingItemIndex = this.playingVideoUrl !== null
             ? this.items.findIndex(item => item.url === this.playingVideoUrl)
             : -1;
 
+        // Save the playing iframe if one exists
+        let playingIframe = null;
+        if (playingItemIndex !== -1) {
+            const currentWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
+            if (currentWrapper && currentWrapper.querySelector('iframe')) {
+                playingIframe = currentWrapper.cloneNode(true); // Save a copy of the iframe
+            }
+        }
+
         this.itemsList.innerHTML = this.items
             .map((item, index) => {
-                // Skip rendering the thumbnail wrapper for items with playing videos
-                // We'll restore the classes later without replacing the iframe
                 return this.createItemElement(item, index, playingItemIndex === index);
             })
             .join('');
+
+        // Restore the playing iframe if one was saved
+        if (playingIframe && playingItemIndex !== -1) {
+            const newWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
+            if (newWrapper) {
+                newWrapper.innerHTML = playingIframe.innerHTML;
+                newWrapper.classList.add('playing');
+            }
+        }
 
         // Add event listeners to URL input fields
         document.querySelectorAll('.song-url-input').forEach((input) => {
@@ -381,22 +397,6 @@ class RankingManager {
             });
         });
 
-        // Restore playing video status - classes are already in the HTML, just mark wrapper as playing
-        if (this.playingVideoUrl !== null) {
-            const playingItemIndex = this.items.findIndex(item => item.url === this.playingVideoUrl);
-            if (playingItemIndex !== -1) {
-                const playingItem = this.items[playingItemIndex];
-                if (playingItem && playingItem.platform === 'YouTube') {
-                    // Just mark the thumbnail wrapper as playing (iframe still has the video playing)
-                    setTimeout(() => {
-                        const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
-                        if (thumbnailWrapper) {
-                            thumbnailWrapper.classList.add('playing');
-                        }
-                    }, 0);
-                }
-            }
-        }
     }
 
     playItem(index) {
