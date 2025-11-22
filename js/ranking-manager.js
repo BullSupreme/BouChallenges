@@ -201,8 +201,17 @@ class RankingManager {
     }
 
     renderItems() {
+        // Check if a video is currently playing
+        const playingItemIndex = this.playingVideoUrl !== null
+            ? this.items.findIndex(item => item.url === this.playingVideoUrl)
+            : -1;
+
         this.itemsList.innerHTML = this.items
-            .map((item, index) => this.createItemElement(item, index))
+            .map((item, index) => {
+                // Skip rendering the thumbnail wrapper for items with playing videos
+                // We'll restore the classes later without replacing the iframe
+                return this.createItemElement(item, index, playingItemIndex === index);
+            })
             .join('');
 
         // Add event listeners to URL input fields
@@ -372,37 +381,17 @@ class RankingManager {
             });
         });
 
-        // Restore playing video if one was active
+        // Restore playing video status - classes are already in the HTML, just mark wrapper as playing
         if (this.playingVideoUrl !== null) {
-            // Find the item with the matching URL
             const playingItemIndex = this.items.findIndex(item => item.url === this.playingVideoUrl);
             if (playingItemIndex !== -1) {
                 const playingItem = this.items[playingItemIndex];
                 if (playingItem && playingItem.platform === 'YouTube') {
-                    // Wait a tick for DOM to be ready, then re-attach the video
+                    // Just mark the thumbnail wrapper as playing (iframe still has the video playing)
                     setTimeout(() => {
                         const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
                         if (thumbnailWrapper) {
-                            const videoId = playingItem.videoId || this.extractYouTubeId(playingItem.url);
-                            const playerHtml = `
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    src="https://www.youtube.com/embed/${videoId}?autoplay=1"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowfullscreen
-                                    style="border-radius: 5px; aspect-ratio: 1;">
-                                </iframe>
-                            `;
-                            thumbnailWrapper.innerHTML = playerHtml;
                             thumbnailWrapper.classList.add('playing');
-
-                            // Add the expanded class to the song-item
-                            const songItem = thumbnailWrapper.closest('.song-item');
-                            if (songItem) {
-                                songItem.classList.add('youtube-expanded');
-                            }
                         }
                     }, 0);
                 }
@@ -587,7 +576,7 @@ class RankingManager {
         this.renderItems();
     }
 
-    createItemElement(item, index) {
+    createItemElement(item, index, isPlayingVideo = false) {
         const rankColor = this.getRankColor(item.rank);
         const canMoveUp = index > 0;
         const canMoveDown = index < this.items.length - 1;
@@ -639,8 +628,9 @@ class RankingManager {
             <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect fill=%22%231e293b%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%2394a3b8%22%3ENo Image%3C/text%3E%3C/svg%3E'">
         `;
 
+        const expandedClass = isPlayingVideo ? 'youtube-expanded' : '';
         return `
-            <div class="song-item ${rankColor}" data-item-index="${index}" draggable="true">
+            <div class="song-item ${rankColor} ${expandedClass}" data-item-index="${index}" draggable="true">
                 <div class="rank-controls">
                     <button class="rank-arrow up-arrow" data-index="${index}" ${!canMoveUp ? 'disabled' : ''}>▲</button>
                     <div class="song-rank">#${item.rank}</div>
