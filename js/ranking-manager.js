@@ -7,7 +7,7 @@ class RankingManager {
         this.challengeType = challengeType;
         this.items = JSON.parse(localStorage.getItem(this.storageKey)) || this.initializeDefaults();
         this.itemsList = document.getElementById('songsList');
-        this.playingVideoIndex = null; // Track which item has video playing
+        this.playingVideoUrl = null; // Track which video URL is playing (survives rank changes)
         this.init();
     }
 
@@ -373,35 +373,39 @@ class RankingManager {
         });
 
         // Restore playing video if one was active
-        if (this.playingVideoIndex !== null) {
-            const playingItem = this.items[this.playingVideoIndex];
-            if (playingItem && playingItem.platform === 'YouTube') {
-                // Wait a tick for DOM to be ready, then re-attach the video
-                setTimeout(() => {
-                    const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${this.playingVideoIndex}"]`);
-                    if (thumbnailWrapper) {
-                        const videoId = playingItem.videoId || this.extractYouTubeId(playingItem.url);
-                        const playerHtml = `
-                            <iframe
-                                width="100%"
-                                height="100%"
-                                src="https://www.youtube.com/embed/${videoId}?autoplay=1"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen
-                                style="border-radius: 5px; aspect-ratio: 1;">
-                            </iframe>
-                        `;
-                        thumbnailWrapper.innerHTML = playerHtml;
-                        thumbnailWrapper.classList.add('playing');
+        if (this.playingVideoUrl !== null) {
+            // Find the item with the matching URL
+            const playingItemIndex = this.items.findIndex(item => item.url === this.playingVideoUrl);
+            if (playingItemIndex !== -1) {
+                const playingItem = this.items[playingItemIndex];
+                if (playingItem && playingItem.platform === 'YouTube') {
+                    // Wait a tick for DOM to be ready, then re-attach the video
+                    setTimeout(() => {
+                        const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
+                        if (thumbnailWrapper) {
+                            const videoId = playingItem.videoId || this.extractYouTubeId(playingItem.url);
+                            const playerHtml = `
+                                <iframe
+                                    width="100%"
+                                    height="100%"
+                                    src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen
+                                    style="border-radius: 5px; aspect-ratio: 1;">
+                                </iframe>
+                            `;
+                            thumbnailWrapper.innerHTML = playerHtml;
+                            thumbnailWrapper.classList.add('playing');
 
-                        // Add the expanded class to the song-item
-                        const songItem = thumbnailWrapper.closest('.song-item');
-                        if (songItem) {
-                            songItem.classList.add('youtube-expanded');
+                            // Add the expanded class to the song-item
+                            const songItem = thumbnailWrapper.closest('.song-item');
+                            if (songItem) {
+                                songItem.classList.add('youtube-expanded');
+                            }
                         }
-                    }
-                }, 0);
+                    }, 0);
+                }
             }
         }
     }
@@ -430,7 +434,7 @@ class RankingManager {
             }
 
             // Clear the tracking variable
-            this.playingVideoIndex = null;
+            this.playingVideoUrl = null;
 
             // Re-attach event listener to the new play button
             const playBtn = thumbnailWrapper.querySelector('.thumbnail-play-btn');
@@ -460,8 +464,8 @@ class RankingManager {
             thumbnailWrapper.innerHTML = playerHtml;
             thumbnailWrapper.classList.add('playing');
 
-            // Track that this video is playing
-            this.playingVideoIndex = index;
+            // Track the URL of the video that is playing (survives rank changes)
+            this.playingVideoUrl = item.url;
 
             // Get the song-item and add scaling class
             const songItem = thumbnailWrapper.closest('.song-item');
