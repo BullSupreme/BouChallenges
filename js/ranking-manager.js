@@ -290,12 +290,12 @@ class RankingManager {
             fileInput.hasListener = true;
         }
 
-        // Add event listener for "Export as HTML" button (with delegation to avoid duplicate listeners)
+        // Add event listener for "Share/Export" button (with delegation to avoid duplicate listeners)
         const exportBtn = document.getElementById('exportBtn');
         if (exportBtn) {
             const newExportBtn = exportBtn.cloneNode(true);
             exportBtn.parentNode.replaceChild(newExportBtn, exportBtn);
-            newExportBtn.addEventListener('click', () => this.exportToHTML());
+            newExportBtn.addEventListener('click', () => this.showExportModal());
         }
 
         // Add event listeners to remove buttons
@@ -772,7 +772,288 @@ class RankingManager {
         }, 3000);
     }
 
-    exportToHTML() {
+    showExportModal() {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.className = 'export-modal-overlay';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+
+        const modalContent = document.createElement('div');
+        modalContent.className = 'export-modal-content';
+        modalContent.style.cssText = `
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            border: 2px solid #a855f7;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(168, 85, 247, 0.3);
+        `;
+
+        const title = document.createElement('h2');
+        title.textContent = 'Share/Export Rankings';
+        title.style.cssText = `
+            color: #f1f5f9;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        `;
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = '⬇️ Download HTML';
+        downloadBtn.style.cssText = `
+            width: 100%;
+            padding: 12px 24px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        downloadBtn.onmouseover = () => {
+            downloadBtn.style.transform = 'translateY(-3px)';
+            downloadBtn.style.boxShadow = '0 8px 20px rgba(168, 85, 247, 0.4)';
+        };
+        downloadBtn.onmouseout = () => {
+            downloadBtn.style.transform = 'translateY(0)';
+            downloadBtn.style.boxShadow = 'none';
+        };
+        downloadBtn.onclick = () => {
+            this.downloadHTMLFile();
+            modal.remove();
+        };
+
+        const discordBtn = document.createElement('button');
+        discordBtn.textContent = '💬 Share to Discord';
+        discordBtn.style.cssText = `
+            width: 100%;
+            padding: 12px 24px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #5865F2 0%, #7289DA 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        discordBtn.onmouseover = () => {
+            discordBtn.style.transform = 'translateY(-3px)';
+            discordBtn.style.boxShadow = '0 8px 20px rgba(88, 101, 242, 0.4)';
+        };
+        discordBtn.onmouseout = () => {
+            discordBtn.style.transform = 'translateY(0)';
+            discordBtn.style.boxShadow = 'none';
+        };
+        discordBtn.onclick = () => {
+            this.shareToDiscord();
+            modal.remove();
+        };
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.textContent = '✕ Cancel';
+        cancelBtn.style.cssText = `
+            width: 100%;
+            padding: 12px 24px;
+            background: transparent;
+            color: #cbd5e1;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        cancelBtn.onmouseover = () => {
+            cancelBtn.style.borderColor = '#a855f7';
+            cancelBtn.style.color = '#f1f5f9';
+        };
+        cancelBtn.onmouseout = () => {
+            cancelBtn.style.borderColor = '#334155';
+            cancelBtn.style.color = '#cbd5e1';
+        };
+        cancelBtn.onclick = () => {
+            modal.remove();
+        };
+
+        modalContent.appendChild(title);
+        modalContent.appendChild(downloadBtn);
+        modalContent.appendChild(discordBtn);
+        modalContent.appendChild(cancelBtn);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+    }
+
+    downloadHTMLFile() {
+        this.exportToHTML();
+    }
+
+    shareToDiscord() {
+        // Get the HTML content
+        const htmlContent = this.generateExportHTML();
+
+        // Generate filename
+        const pageTitleElement = document.querySelector('.songs-list h2');
+        let filename = 'Rankings.html';
+        if (pageTitleElement) {
+            const pageTitle = pageTitleElement.textContent.trim();
+            filename = pageTitle.replace(/\s+/g, '') + '.html';
+        }
+
+        // Create blob and generate a data URL for display
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+
+        // Show instructions for sharing to Discord
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            border: 2px solid #5865F2;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(88, 101, 242, 0.3);
+        `;
+
+        const title = document.createElement('h2');
+        title.textContent = 'Share to Discord';
+        title.style.cssText = `
+            color: #5865F2;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        `;
+
+        const instructions = document.createElement('p');
+        instructions.innerHTML = `
+            <strong>Option 1: Direct Download & Upload</strong><br>
+            Click the download button below, then upload the file directly to Discord by dragging it into the chat.
+            <br><br>
+            <strong>Option 2: Copy Link</strong><br>
+            Click "Copy Share Link" below, then paste it in Discord. (Note: This link expires after 1 hour)
+        `;
+        instructions.style.cssText = `
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            text-align: left;
+        `;
+
+        const downloadDiscordBtn = document.createElement('button');
+        downloadDiscordBtn.textContent = '⬇️ Download for Discord';
+        downloadDiscordBtn.style.cssText = `
+            width: 100%;
+            padding: 12px 24px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #5865F2 0%, #7289DA 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        downloadDiscordBtn.onclick = () => {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            modal.remove();
+        };
+
+        const copyLinkBtn = document.createElement('button');
+        copyLinkBtn.textContent = '🔗 Copy Share Link';
+        copyLinkBtn.style.cssText = `
+            width: 100%;
+            padding: 12px 24px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        copyLinkBtn.onclick = () => {
+            // For now, we'll use a data URL which browsers can handle
+            // In a real app, you'd upload to a server and get a shareable link
+            navigator.clipboard.writeText(url).then(() => {
+                copyLinkBtn.textContent = '✓ Copied!';
+                setTimeout(() => {
+                    copyLinkBtn.textContent = '🔗 Copy Share Link';
+                }, 2000);
+            });
+        };
+
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕ Close';
+        closeBtn.style.cssText = `
+            width: 100%;
+            padding: 12px 24px;
+            background: transparent;
+            color: #cbd5e1;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        `;
+        closeBtn.onclick = () => {
+            modal.remove();
+        };
+
+        content.appendChild(title);
+        content.appendChild(instructions);
+        content.appendChild(downloadDiscordBtn);
+        content.appendChild(copyLinkBtn);
+        content.appendChild(closeBtn);
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+    }
+
+    generateExportHTML() {
+        // This is the same HTML generation as exportToHTML but returns the content instead of downloading
         const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -939,6 +1220,12 @@ class RankingManager {
     </div>
 </body>
 </html>`;
+
+        return htmlContent;
+    }
+
+    exportToHTML() {
+        const htmlContent = this.generateExportHTML();
 
         const blob = new Blob([htmlContent], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
