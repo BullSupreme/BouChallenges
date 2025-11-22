@@ -206,30 +206,35 @@ class RankingManager {
             ? this.items.findIndex(item => item.url === this.playingVideoUrl)
             : -1;
 
-        // Save the actual wrapper with the live iframe (not a clone)
-        let playingWrapperElement = null;
-        if (playingItemIndex !== -1) {
-            playingWrapperElement = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
-            if (playingWrapperElement && !playingWrapperElement.querySelector('iframe')) {
-                // Only save if it has an iframe (is actually playing)
-                playingWrapperElement = null;
-            }
-        }
-
-        // Create and insert new HTML
         this.itemsList.innerHTML = this.items
             .map((item, index) => {
                 return this.createItemElement(item, index, playingItemIndex === index);
             })
             .join('');
 
-        // If a video was playing, move the original playing wrapper back into the new DOM
-        if (playingWrapperElement && playingItemIndex !== -1) {
-            const newWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
-            if (newWrapper && newWrapper.parentNode) {
-                // Replace the newly created wrapper with the original live one
-                newWrapper.parentNode.replaceChild(playingWrapperElement, newWrapper);
-                playingWrapperElement.classList.add('playing');
+        // Re-attach the video if one was playing (it will restart, but autoplay keeps it playing)
+        if (playingItemIndex !== -1) {
+            const playingItem = this.items[playingItemIndex];
+            if (playingItem && playingItem.platform === 'YouTube') {
+                setTimeout(() => {
+                    const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
+                    if (thumbnailWrapper) {
+                        const videoId = playingItem.videoId || this.extractYouTubeId(playingItem.url);
+                        const playerHtml = `
+                            <iframe
+                                width="100%"
+                                height="100%"
+                                src="https://www.youtube.com/embed/${videoId}?autoplay=1"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen
+                                style="border-radius: 5px; aspect-ratio: 1;">
+                            </iframe>
+                        `;
+                        thumbnailWrapper.innerHTML = playerHtml;
+                        thumbnailWrapper.classList.add('playing');
+                    }
+                }, 0);
             }
         }
 
