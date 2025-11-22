@@ -201,32 +201,35 @@ class RankingManager {
     }
 
     renderItems() {
-        // Check if a video is currently playing and preserve its iframe
+        // Check if a video is currently playing
         const playingItemIndex = this.playingVideoUrl !== null
             ? this.items.findIndex(item => item.url === this.playingVideoUrl)
             : -1;
 
-        // Save the playing iframe if one exists
-        let playingIframe = null;
+        // Save the actual wrapper with the live iframe (not a clone)
+        let playingWrapperElement = null;
         if (playingItemIndex !== -1) {
-            const currentWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
-            if (currentWrapper && currentWrapper.querySelector('iframe')) {
-                playingIframe = currentWrapper.cloneNode(true); // Save a copy of the iframe
+            playingWrapperElement = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
+            if (playingWrapperElement && !playingWrapperElement.querySelector('iframe')) {
+                // Only save if it has an iframe (is actually playing)
+                playingWrapperElement = null;
             }
         }
 
+        // Create and insert new HTML
         this.itemsList.innerHTML = this.items
             .map((item, index) => {
                 return this.createItemElement(item, index, playingItemIndex === index);
             })
             .join('');
 
-        // Restore the playing iframe if one was saved
-        if (playingIframe && playingItemIndex !== -1) {
+        // If a video was playing, move the original playing wrapper back into the new DOM
+        if (playingWrapperElement && playingItemIndex !== -1) {
             const newWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
-            if (newWrapper) {
-                newWrapper.innerHTML = playingIframe.innerHTML;
-                newWrapper.classList.add('playing');
+            if (newWrapper && newWrapper.parentNode) {
+                // Replace the newly created wrapper with the original live one
+                newWrapper.parentNode.replaceChild(playingWrapperElement, newWrapper);
+                playingWrapperElement.classList.add('playing');
             }
         }
 
