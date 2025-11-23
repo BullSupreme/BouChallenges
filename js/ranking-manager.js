@@ -924,27 +924,31 @@ class RankingManager {
                   const platformHtml = item.url
                     ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.url}</a>`
                     : item.platform;
-                  const itemContent = `
-                <div class="song-rank">#${item.rank}</div>
-                <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
-                <div class="song-info">
-                    <div class="song-title">${this.escapeHtml(item.title)}</div>
-                    <div class="song-artist">${this.escapeHtml(item.artist)}</div>
-                    <div class="song-platform">${platformHtml}</div>
-                </div>`;
 
                   // Wrap in anchor tag if URL exists, otherwise just use div
                   if (item.url) {
                     return `
             <a href="${item.url}" target="_blank" style="text-decoration: none; display: block;">
                 <div class="song-item ${rankClass}">
-                    ${itemContent}
+                    <div class="song-rank">#${item.rank}</div>
+                    <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
+                    <div class="song-info">
+                        <div class="song-title">${this.escapeHtml(item.title)}</div>
+                        <div class="song-artist">${this.escapeHtml(item.artist)}</div>
+                        <div class="song-platform">${platformHtml}</div>
+                    </div>
                 </div>
             </a>`;
                   } else {
                     return `
             <div class="song-item ${rankClass}">
-                ${itemContent}
+                <div class="song-rank">#${item.rank}</div>
+                <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">${this.escapeHtml(item.title)}</div>
+                    <div class="song-artist">${this.escapeHtml(item.artist)}</div>
+                    <div class="song-platform">${platformHtml}</div>
+                </div>
             </div>`;
                   }
                 }
