@@ -737,12 +737,16 @@ class RankingManager {
     }
 
     exportToHTML() {
+        // Get the category title from the page
+        const pageTitleElement = document.querySelector('.songs-list h2');
+        const categoryTitle = pageTitleElement ? pageTitleElement.textContent.trim() : 'Rankings';
+
         const htmlContent = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rankings - Bou Challenges</title>
+    <title>${this.escapeHtml(categoryTitle)} - Bou Challenges</title>
     <style>
         * {
             margin: 0;
@@ -867,7 +871,7 @@ class RankingManager {
 </head>
 <body>
     <div class="container">
-        <h1>Rankings</h1>
+        <h1>${this.escapeHtml(categoryTitle)}</h1>
         <div class="songs-list">
             ${this.items
               .filter(item => item.title)
