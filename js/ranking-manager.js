@@ -945,15 +945,9 @@ class RankingManager {
         const a = document.createElement('a');
         a.href = url;
 
-        // Generate dynamic filename from the page title (h2 element)
-        const pageTitleElement = document.querySelector('.songs-list h2');
-        let filename = 'Rankings.html';
-        if (pageTitleElement) {
-            // Get the text content and format it for a filename
-            // e.g., "Top Disney Songs" -> "TopDisneySongs.html"
-            const pageTitle = pageTitleElement.textContent.trim();
-            filename = pageTitle.replace(/\s+/g, '') + '.html';
-        }
+        // Generate dynamic filename from the category title
+        // e.g., "Top Disney Songs" -> "TopDisneySongs.html"
+        const filename = categoryTitle.replace(/\s+/g, '') + '.html';
         a.download = filename;
 
         document.body.appendChild(a);
