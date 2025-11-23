@@ -675,8 +675,26 @@ class RankingManager {
                     // Regular YouTube/other item import
                     title = element.querySelector('.song-title')?.textContent || '';
                     artist = element.querySelector('.song-artist')?.textContent || '';
-                    platform = element.querySelector('.song-platform')?.textContent || '';
                     thumbnailUrl = element.querySelector('.song-thumbnail')?.src || '';
+
+                    // Get platform and URL from song-platform (which may contain a link or text)
+                    const platformElement = element.querySelector('.song-platform');
+                    if (platformElement) {
+                        const link = platformElement.querySelector('a');
+                        if (link) {
+                            // Extract URL from the link
+                            url = link.href || '';
+                            platform = link.textContent.includes('youtube') || link.textContent.includes('youtu.be') ? 'YouTube' : 'Unknown';
+                            // Try to extract video ID if YouTube
+                            if (platform === 'YouTube' && url) {
+                                const videoMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/);
+                                if (videoMatch) videoId = videoMatch[1];
+                            }
+                        } else {
+                            // Fallback to text content if no link
+                            platform = platformElement.textContent || '';
+                        }
+                    }
                 }
 
                 if (title || url) {
