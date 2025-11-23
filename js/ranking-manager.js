@@ -795,6 +795,10 @@ class RankingManager {
             flex-direction: column;
             gap: 15px;
         }
+        .songs-list > a {
+            text-decoration: none;
+            display: block;
+        }
         .song-item {
             display: grid;
             grid-template-columns: 60px 120px 1fr;
