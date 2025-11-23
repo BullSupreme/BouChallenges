@@ -8,6 +8,7 @@ class RankingManager {
         this.items = JSON.parse(localStorage.getItem(this.storageKey)) || this.initializeDefaults();
         this.itemsList = document.getElementById('songsList');
         this.playingVideoUrl = null; // Track which video URL is playing (survives rank changes)
+        this.videoPaused = false; // Track if user has paused the video
         this.init();
     }
 
@@ -201,8 +202,8 @@ class RankingManager {
     }
 
     renderItems() {
-        // Check if a video is currently playing
-        const playingItemIndex = this.playingVideoUrl !== null
+        // Check if a video is currently playing and NOT paused
+        const playingItemIndex = (this.playingVideoUrl !== null && !this.videoPaused)
             ? this.items.findIndex(item => item.url === this.playingVideoUrl)
             : -1;
 
@@ -212,8 +213,8 @@ class RankingManager {
             })
             .join('');
 
-        // Re-attach the video if one was playing (it will restart, but autoplay keeps it playing)
-        if (playingItemIndex !== -1) {
+        // Re-attach the video if one was playing and not paused (it will restart, but autoplay keeps it playing)
+        if (playingItemIndex !== -1 && !this.videoPaused) {
             const playingItem = this.items[playingItemIndex];
             if (playingItem && playingItem.platform === 'YouTube') {
                 setTimeout(() => {
@@ -430,8 +431,9 @@ class RankingManager {
                 songItem.classList.remove('youtube-expanded');
             }
 
-            // Clear the tracking variable
+            // Clear the tracking variable and mark as paused
             this.playingVideoUrl = null;
+            this.videoPaused = true;
 
             // Re-attach event listener to the new play button
             const playBtn = thumbnailWrapper.querySelector('.thumbnail-play-btn');
@@ -463,6 +465,8 @@ class RankingManager {
 
             // Track the URL of the video that is playing (survives rank changes)
             this.playingVideoUrl = item.url;
+            // Reset paused state when new video is played
+            this.videoPaused = false;
 
             // Get the song-item and add scaling class
             const songItem = thumbnailWrapper.closest('.song-item');
