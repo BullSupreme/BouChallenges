@@ -782,6 +782,14 @@ class RankingManager {
             padding: 15px 20px;
             border-radius: 10px;
             border: 2px solid #334155;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .song-item:hover {
+            background: linear-gradient(135deg, #2d3f4f 0%, #3a4a5a 100%);
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
         }
         .song-item-spotify {
             grid-template-columns: 60px 1fr;
@@ -894,16 +902,29 @@ class RankingManager {
                   const platformHtml = item.url
                     ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.url}</a>`
                     : item.platform;
-                  return `
-            <div class="song-item ${rankClass}">
+                  const itemContent = `
                 <div class="song-rank">#${item.rank}</div>
                 <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
                 <div class="song-info">
                     <div class="song-title">${this.escapeHtml(item.title)}</div>
                     <div class="song-artist">${this.escapeHtml(item.artist)}</div>
                     <div class="song-platform">${platformHtml}</div>
+                </div>`;
+
+                  // Wrap in anchor tag if URL exists, otherwise just use div
+                  if (item.url) {
+                    return `
+            <a href="${item.url}" target="_blank" style="text-decoration: none; display: block;">
+                <div class="song-item ${rankClass}">
+                    ${itemContent}
                 </div>
+            </a>`;
+                  } else {
+                    return `
+            <div class="song-item ${rankClass}">
+                ${itemContent}
             </div>`;
+                  }
                 }
               })
               .join('')}
