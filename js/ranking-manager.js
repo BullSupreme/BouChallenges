@@ -892,7 +892,7 @@ class RankingManager {
             </div>`;
                 } else {
                   const platformHtml = item.url
-                    ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.platform}</a>`
+                    ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.url}</a>`
                     : item.platform;
                   return `
             <div class="song-item ${rankClass}">
