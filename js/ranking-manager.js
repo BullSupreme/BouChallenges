@@ -795,10 +795,6 @@ class RankingManager {
             flex-direction: column;
             gap: 15px;
         }
-        .songs-list > a {
-            text-decoration: none;
-            display: block;
-        }
         .song-item {
             display: grid;
             grid-template-columns: 60px 120px 1fr;
@@ -929,23 +925,10 @@ class RankingManager {
                     ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.url}</a>`
                     : item.platform;
 
-                  // Wrap in anchor tag if URL exists, otherwise just use div
-                  if (item.url) {
-                    return `
-            <a href="${item.url}" target="_blank" style="text-decoration: none; display: block;">
-                <div class="song-item ${rankClass}">
-                    <div class="song-rank">#${item.rank}</div>
-                    <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
-                    <div class="song-info">
-                        <div class="song-title">${this.escapeHtml(item.title)}</div>
-                        <div class="song-artist">${this.escapeHtml(item.artist)}</div>
-                        <div class="song-platform">${platformHtml}</div>
-                    </div>
-                </div>
-            </a>`;
-                  } else {
-                    return `
-            <div class="song-item ${rankClass}">
+                  // Add onclick to open URL if it exists
+                  const onclickAttr = item.url ? ` onclick="window.open('${item.url}', '_blank');"` : '';
+                  return `
+            <div class="song-item ${rankClass}"${onclickAttr}>
                 <div class="song-rank">#${item.rank}</div>
                 <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
                 <div class="song-info">
@@ -954,7 +937,6 @@ class RankingManager {
                     <div class="song-platform">${platformHtml}</div>
                 </div>
             </div>`;
-                  }
                 }
               })
               .join('')}
