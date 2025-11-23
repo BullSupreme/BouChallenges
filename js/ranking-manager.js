@@ -840,6 +840,14 @@ class RankingManager {
             color: #a855f7;
             font-weight: 500;
         }
+        .song-platform a {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .song-platform a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
         footer {
             text-align: center;
             padding: 20px 0;
@@ -883,6 +891,9 @@ class RankingManager {
                 </div>
             </div>`;
                 } else {
+                  const platformHtml = item.url
+                    ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.platform}</a>`
+                    : item.platform;
                   return `
             <div class="song-item ${rankClass}">
                 <div class="song-rank">#${item.rank}</div>
@@ -890,7 +901,7 @@ class RankingManager {
                 <div class="song-info">
                     <div class="song-title">${this.escapeHtml(item.title)}</div>
                     <div class="song-artist">${this.escapeHtml(item.artist)}</div>
-                    <div class="song-platform">${item.platform}</div>
+                    <div class="song-platform">${platformHtml}</div>
                 </div>
             </div>`;
                 }
