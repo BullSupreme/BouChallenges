@@ -7,8 +7,6 @@ class RankingManager {
         this.challengeType = challengeType;
         this.items = JSON.parse(localStorage.getItem(this.storageKey)) || this.initializeDefaults();
         this.itemsList = document.getElementById('songsList');
-        this.playingVideoUrl = null; // Track which video URL is playing (survives rank changes)
-        this.videoPaused = false; // Track if user has paused the video
         this.init();
     }
 
@@ -202,42 +200,11 @@ class RankingManager {
     }
 
     renderItems() {
-        // Check if a video is currently playing and NOT paused
-        const playingItemIndex = (this.playingVideoUrl !== null && !this.videoPaused)
-            ? this.items.findIndex(item => item.url === this.playingVideoUrl)
-            : -1;
-
         this.itemsList.innerHTML = this.items
             .map((item, index) => {
-                return this.createItemElement(item, index, playingItemIndex === index);
+                return this.createItemElement(item, index);
             })
             .join('');
-
-        // Re-attach the video if one was playing and not paused (it will restart, but autoplay keeps it playing)
-        if (playingItemIndex !== -1 && !this.videoPaused) {
-            const playingItem = this.items[playingItemIndex];
-            if (playingItem && playingItem.platform === 'YouTube') {
-                setTimeout(() => {
-                    const thumbnailWrapper = document.querySelector(`.thumbnail-wrapper[data-index="${playingItemIndex}"]`);
-                    if (thumbnailWrapper) {
-                        const videoId = playingItem.videoId || this.extractYouTubeId(playingItem.url);
-                        const playerHtml = `
-                            <iframe
-                                width="100%"
-                                height="100%"
-                                src="https://www.youtube.com/embed/${videoId}?autoplay=1"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen
-                                style="border-radius: 5px; aspect-ratio: 1;">
-                            </iframe>
-                        `;
-                        thumbnailWrapper.innerHTML = playerHtml;
-                        thumbnailWrapper.classList.add('playing');
-                    }
-                }, 0);
-            }
-        }
 
         // Add event listeners to URL input fields
         document.querySelectorAll('.song-url-input').forEach((input) => {
@@ -431,9 +398,6 @@ class RankingManager {
                 songItem.classList.remove('youtube-expanded');
             }
 
-            // Clear the tracking variable and mark as paused
-            this.playingVideoUrl = null;
-            this.videoPaused = true;
 
             // Re-attach event listener to the new play button
             const playBtn = thumbnailWrapper.querySelector('.thumbnail-play-btn');
@@ -463,10 +427,6 @@ class RankingManager {
             thumbnailWrapper.innerHTML = playerHtml;
             thumbnailWrapper.classList.add('playing');
 
-            // Track the URL of the video that is playing (survives rank changes)
-            this.playingVideoUrl = item.url;
-            // Reset paused state when new video is played
-            this.videoPaused = false;
 
             // Get the song-item and add scaling class
             const songItem = thumbnailWrapper.closest('.song-item');
