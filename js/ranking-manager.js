@@ -7,145 +7,23 @@ class RankingManager {
         this.challengeType = challengeType;
         this.items = JSON.parse(localStorage.getItem(this.storageKey)) || this.initializeDefaults();
         this.itemsList = document.getElementById('songsList');
-
-        // Playlist properties
-        this.playlistMode = null; // 'playlist', 'shuffle', or null
-        this.playedVideoIndices = new Set(); // Track played video indices
-        this.currentPlayingIndex = -1; // Currently playing video index
-        this.continuousMode = false; // Continue playing after all videos
-        this.playbackTimer = null; // Timer for auto-advance
-
         this.init();
     }
 
     initializeDefaults() {
         // Create 5 default empty ranking slots
         return [
-            { rank: 1, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
-            { rank: 2, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
-            { rank: 3, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
-            { rank: 4, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
-            { rank: 5, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 }
+            { rank: 1, title: '', artist: '', platform: '', thumbnailUrl: '' },
+            { rank: 2, title: '', artist: '', platform: '', thumbnailUrl: '' },
+            { rank: 3, title: '', artist: '', platform: '', thumbnailUrl: '' },
+            { rank: 4, title: '', artist: '', platform: '', thumbnailUrl: '' },
+            { rank: 5, title: '', artist: '', platform: '', thumbnailUrl: '' }
         ];
     }
 
     init() {
-        // Ensure all items have duration property
-        this.items = this.items.map(item => {
-            if (!item.hasOwnProperty('duration')) {
-                item.duration = item.platform === 'YouTube' ? 240 : 0;
-            }
-            return item;
-        });
-        this.saveItems();
-
-        // Setup playback controls
-        this.setupPlaybackControls();
         // Initial render
         this.renderItems();
-    }
-
-    setupPlaybackControls() {
-        // Find or create playback control bar
-        let controlBar = document.getElementById('playbackControlBar');
-        if (!controlBar) {
-            controlBar = document.createElement('div');
-            controlBar.id = 'playbackControlBar';
-            controlBar.style.cssText = `
-                display: flex;
-                gap: 10px;
-                margin-bottom: 20px;
-                padding: 15px;
-                background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
-                border-radius: 10px;
-                border: 2px solid #334155;
-                align-items: center;
-                flex-wrap: wrap;
-            `;
-
-            const playlistBtn = document.createElement('button');
-            playlistBtn.textContent = '▶ Playlist';
-            playlistBtn.id = 'playlistBtn';
-            playlistBtn.style.cssText = `
-                padding: 10px 20px;
-                background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-weight: 600;
-                transition: all 0.3s ease;
-            `;
-            playlistBtn.addEventListener('click', () => this.togglePlaylistMode());
-
-            const shuffleBtn = document.createElement('button');
-            shuffleBtn.textContent = '🔀 Shuffle';
-            shuffleBtn.id = 'shuffleBtn';
-            shuffleBtn.style.cssText = `
-                padding: 10px 20px;
-                background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-weight: 600;
-                transition: all 0.3s ease;
-            `;
-            shuffleBtn.addEventListener('click', () => this.toggleShuffleMode());
-
-            const stopBtn = document.createElement('button');
-            stopBtn.textContent = '⏹ Stop';
-            stopBtn.id = 'stopBtn';
-            stopBtn.style.cssText = `
-                padding: 10px 20px;
-                background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-weight: 600;
-                transition: all 0.3s ease;
-            `;
-            stopBtn.addEventListener('click', () => this.stopPlayback());
-
-            const continuousLabel = document.createElement('label');
-            continuousLabel.style.cssText = `
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                color: #cbd5e1;
-                cursor: pointer;
-                user-select: none;
-            `;
-            const continuousCheckbox = document.createElement('input');
-            continuousCheckbox.type = 'checkbox';
-            continuousCheckbox.id = 'continuousToggle';
-            continuousCheckbox.checked = this.continuousMode;
-            continuousCheckbox.style.cssText = 'cursor: pointer; width: 18px; height: 18px;';
-            continuousCheckbox.addEventListener('change', (e) => {
-                this.continuousMode = e.target.checked;
-            });
-            continuousLabel.appendChild(continuousCheckbox);
-            continuousLabel.appendChild(document.createTextNode('Continuous'));
-
-            const statusSpan = document.createElement('span');
-            statusSpan.id = 'playbackStatus';
-            statusSpan.style.cssText = `
-                color: #cbd5e1;
-                font-size: 0.9em;
-                margin-left: auto;
-            `;
-            statusSpan.textContent = 'Ready';
-
-            controlBar.appendChild(playlistBtn);
-            controlBar.appendChild(shuffleBtn);
-            controlBar.appendChild(stopBtn);
-            controlBar.appendChild(continuousLabel);
-            controlBar.appendChild(statusSpan);
-
-            // Insert before songs list
-            this.itemsList.parentNode.insertBefore(controlBar, this.itemsList);
-        }
     }
 
     // Parse URL and extract metadata (YouTube/Spotify specific)
@@ -203,9 +81,6 @@ class RankingManager {
             console.log('Could not fetch YouTube title via oEmbed, using default');
         }
 
-        // Fetch video duration
-        const duration = await this.getYouTubeVideoDuration(videoId);
-
         return {
             platform: 'YouTube',
             title: title,
@@ -213,55 +88,7 @@ class RankingManager {
             thumbnailUrl: thumbnailUrl,
             url: url,
             videoId: videoId,
-            duration: duration,
         };
-    }
-
-    async getYouTubeVideoDuration(videoId) {
-        // Try using CORS proxy to fetch YouTube page
-        try {
-            const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
-
-            const response = await fetch(proxyUrl);
-
-            if (response.ok) {
-                const html = await response.text();
-
-                // Try to extract duration from the page
-                const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
-                if (durationMatch && durationMatch[1]) {
-                    const duration = parseInt(durationMatch[1]);
-                    console.log(`Found duration for video ${videoId}: ${duration} seconds`);
-                    return duration;
-                }
-
-                // Alternative: Try to find in approxDurationMs
-                const approxMatch = html.match(/"approxDurationMs":"(\d+)"/);
-                if (approxMatch && approxMatch[1]) {
-                    const duration = Math.floor(parseInt(approxMatch[1]) / 1000);
-                    console.log(`Found duration for video ${videoId}: ${duration} seconds (from approxDurationMs)`);
-                    return duration;
-                }
-            }
-        } catch (error) {
-            console.log(`Could not fetch duration for video ${videoId}:`, error.message);
-        }
-
-        console.log(`Using default duration for video ${videoId}: 240 seconds`);
-        return 240; // 4 minutes default
-    }
-
-    parseISO8601Duration(duration) {
-        // Parse ISO 8601 duration format (e.g., "PT4M33S" = 4 minutes 33 seconds)
-        const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-        if (!match) return 0;
-
-        const hours = parseInt(match[1] || 0);
-        const minutes = parseInt(match[2] || 0);
-        const seconds = parseInt(match[3] || 0);
-
-        return hours * 3600 + minutes * 60 + seconds;
     }
 
     async getSpotifyData(url) {
@@ -373,9 +200,6 @@ class RankingManager {
     }
 
     renderItems() {
-        // Note: Don't stop playlist on every render - only on manual drag/drop or rank changes
-        // Playlist will manage its own advancement
-
         this.itemsList.innerHTML = this.items
             .map((item, index) => {
                 return this.createItemElement(item, index);
@@ -644,180 +468,13 @@ class RankingManager {
         }
     }
 
-    // Get next YouTube item index (skip Spotify and empty items)
-    getNextYouTubeIndex(currentIndex, mode = 'sequential') {
-        const youtubeItems = this.items
-            .map((item, idx) => ({ item, index: idx }))
-            .filter(({ item }) => item.platform === 'YouTube' && item.url && item.title);
-
-        if (youtubeItems.length === 0) return -1;
-
-        if (mode === 'shuffle') {
-            // Get unplayed items
-            const unplayedItems = youtubeItems.filter(({ index }) => !this.playedVideoIndices.has(index));
-
-            if (unplayedItems.length === 0) {
-                // All played
-                if (this.continuousMode) {
-                    // Reset and start new shuffle
-                    this.playedVideoIndices.clear();
-                    return youtubeItems[Math.floor(Math.random() * youtubeItems.length)].index;
-                }
-                return -1;
-            }
-
-            // Pick random from unplayed
-            return unplayedItems[Math.floor(Math.random() * unplayedItems.length)].index;
-        } else {
-            // Sequential mode
-            const nextIndex = currentIndex + 1;
-            const nextItem = youtubeItems.find(({ index }) => index >= nextIndex);
-
-            if (nextItem) {
-                return nextItem.index;
-            } else if (this.continuousMode) {
-                // Loop back to start
-                return youtubeItems[0].index;
-            }
-            return -1;
-        }
-    }
-
-    togglePlaylistMode() {
-        if (this.playlistMode === 'playlist') {
-            this.stopPlayback();
-        } else {
-            this.playlistMode = 'playlist';
-            this.playedVideoIndices.clear();
-            this.updatePlaybackUI();
-
-            // Start playlist from rank 1
-            const firstYoutubeIndex = this.getNextYouTubeIndex(-1, 'sequential');
-            if (firstYoutubeIndex !== -1) {
-                this.playPlaylistVideo(firstYoutubeIndex);
-            } else {
-                this.showMessage('No YouTube videos found to play', 'error-message');
-            }
-        }
-    }
-
-    toggleShuffleMode() {
-        if (this.playlistMode === 'shuffle') {
-            this.stopPlayback();
-        } else {
-            this.playlistMode = 'shuffle';
-            this.playedVideoIndices.clear();
-            this.updatePlaybackUI();
-
-            // Start shuffle
-            const randomIndex = this.getNextYouTubeIndex(-1, 'shuffle');
-            if (randomIndex !== -1) {
-                this.playPlaylistVideo(randomIndex);
-            } else {
-                this.showMessage('No YouTube videos found to play', 'error-message');
-            }
-        }
-    }
-
-    playPlaylistVideo(index) {
-        this.currentPlayingIndex = index;
-        this.playedVideoIndices.add(index);
-
-        // Play the video
-        this.playItem(index);
-
-        // Setup auto-advance
-        const item = this.items[index];
-        if (item.platform === 'YouTube') {
-            // Use duration if available (in seconds), default to 4 minutes
-            const videoDuration = item.duration || 240;
-            // Calculate duration + 2 second buffer for safety
-            const autoAdvanceDelay = (videoDuration + 2) * 1000;
-
-            // Clear any existing timer
-            if (this.playbackTimer) {
-                clearTimeout(this.playbackTimer);
-            }
-
-            this.playbackTimer = setTimeout(() => {
-                console.log(`Auto-advancing from: ${item.title}`);
-                this.advancePlaylist();
-            }, autoAdvanceDelay);
-
-            console.log(`Auto-advance in ${videoDuration + 2} seconds for: ${item.title}`);
-        }
-
-        this.updatePlaybackUI();
-    }
-
-    advancePlaylist() {
-        if (!this.playlistMode) return;
-
-        const nextIndex = this.getNextYouTubeIndex(this.currentPlayingIndex, this.playlistMode);
-
-        if (nextIndex === -1) {
-            // No more videos to play
-            this.playlistMode = null;
-            this.updatePlaybackUI();
-            this.showMessage('Playlist finished!', 'success-message');
-        } else {
-            this.playPlaylistVideo(nextIndex);
-        }
-    }
-
-    stopPlayback() {
-        this.playlistMode = null;
-        this.playedVideoIndices.clear();
-        this.currentPlayingIndex = -1;
-
-        if (this.playbackTimer) {
-            clearTimeout(this.playbackTimer);
-            this.playbackTimer = null;
-        }
-
-        this.updatePlaybackUI();
-    }
-
-    updatePlaybackUI() {
-        const statusSpan = document.getElementById('playbackStatus');
-        const playlistBtn = document.getElementById('playlistBtn');
-        const shuffleBtn = document.getElementById('shuffleBtn');
-
-        if (!statusSpan) return;
-
-        if (this.playlistMode === 'playlist') {
-            statusSpan.textContent = `Playing: ${this.playedVideoIndices.size} of ${this.getYouTubeItemCount()}`;
-            playlistBtn.style.opacity = '0.7';
-            playlistBtn.style.boxShadow = '0 0 15px rgba(168, 85, 247, 0.5)';
-            shuffleBtn.style.opacity = '1';
-            shuffleBtn.style.boxShadow = 'none';
-        } else if (this.playlistMode === 'shuffle') {
-            statusSpan.textContent = `Shuffling: ${this.playedVideoIndices.size} of ${this.getYouTubeItemCount()}`;
-            shuffleBtn.style.opacity = '0.7';
-            shuffleBtn.style.boxShadow = '0 0 15px rgba(6, 182, 212, 0.5)';
-            playlistBtn.style.opacity = '1';
-            playlistBtn.style.opacity = '1';
-        } else {
-            statusSpan.textContent = 'Ready';
-            playlistBtn.style.opacity = '1';
-            playlistBtn.style.boxShadow = 'none';
-            shuffleBtn.style.opacity = '1';
-            shuffleBtn.style.boxShadow = 'none';
-        }
-    }
-
-    getYouTubeItemCount() {
-        return this.items.filter(item => item.platform === 'YouTube' && item.url && item.title).length;
-    }
-
     addRank() {
         this.items.push({
             rank: this.items.length + 1,
             title: '',
             artist: '',
             platform: '',
-            thumbnailUrl: '',
-            duration: 0
+            thumbnailUrl: ''
         });
         this.saveItems();
         this.renderItems();
@@ -847,8 +504,7 @@ class RankingManager {
             artist: '',
             platform: '',
             thumbnailUrl: '',
-            url: '',
-            duration: 0
+            url: ''
         };
         this.saveItems();
         this.renderItems();
@@ -880,11 +536,6 @@ class RankingManager {
 
     swapItems(fromIndex, toIndex) {
         if (fromIndex === toIndex) return;
-
-        // Stop playlist when items are reordered
-        if (this.playlistMode) {
-            this.stopPlayback();
-        }
 
         // Swap the items
         [this.items[fromIndex], this.items[toIndex]] = [this.items[toIndex], this.items[fromIndex]];
@@ -963,28 +614,11 @@ class RankingManager {
                         ${this.escapeHtml(displayText)}
                         ${externalButton}
                     </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}" style="flex: 1;">
-                        ${item.duration && item.platform === 'YouTube' ? `<span class="video-duration" style="font-size: 0.75em; color: #94a3b8; white-space: nowrap;">${this.formatDuration(item.duration)}</span>` : ''}
-                    </div>
+                    <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}">
                 </div>
                 <button class="remove-btn" data-index="${index}">×</button>
             </div>
         `;
-    }
-
-    formatDuration(seconds) {
-        if (!seconds || seconds === 0) return '';
-
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-
-        if (hours > 0) {
-            return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        } else {
-            return `${minutes}:${secs.toString().padStart(2, '0')}`;
-        }
     }
 
     escapeHtml(text) {
