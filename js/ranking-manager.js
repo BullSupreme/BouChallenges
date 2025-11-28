@@ -219,15 +219,62 @@ class RankingManager {
 
     async getYouTubeVideoDuration(videoId) {
         try {
-            // Try to get duration from YouTube Data API if available
-            // For now, we estimate based on video metadata or use a default
-            // Since oEmbed doesn't provide duration and Data API requires authentication,
-            // we'll use a reasonable default of 4 minutes
-            return 240; // 4 minutes default (240 seconds)
+            // Fetch the YouTube page to extract duration from structured data
+            const pageUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            const response = await fetch(pageUrl);
+
+            if (!response.ok) {
+                console.log('Failed to fetch YouTube page');
+                return 240;
+            }
+
+            const html = await response.text();
+
+            // Try to extract duration from JSON-LD structured data
+            // YouTube embeds video metadata in <script type="application/ld+json">
+            const jsonLdMatch = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
+            if (jsonLdMatch && jsonLdMatch[1]) {
+                try {
+                    const data = JSON.parse(jsonLdMatch[1]);
+                    if (data.duration) {
+                        // Duration is in ISO 8601 format like "PT4M33S" (4 minutes 33 seconds)
+                        const duration = this.parseISO8601Duration(data.duration);
+                        if (duration > 0) {
+                            console.log(`Found duration for video ${videoId}: ${duration} seconds`);
+                            return duration;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Error parsing JSON-LD data:', e);
+                }
+            }
+
+            // Fallback: Try to find duration in meta tags or other locations
+            const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
+            if (durationMatch && durationMatch[1]) {
+                const duration = parseInt(durationMatch[1]);
+                console.log(`Found duration for video ${videoId}: ${duration} seconds`);
+                return duration;
+            }
+
         } catch (error) {
-            console.log('Could not fetch YouTube duration, using default');
+            console.log('Could not fetch YouTube duration:', error);
         }
+
+        console.log(`Using default duration for video ${videoId}: 240 seconds`);
         return 240; // 4 minutes default
+    }
+
+    parseISO8601Duration(duration) {
+        // Parse ISO 8601 duration format (e.g., "PT4M33S" = 4 minutes 33 seconds)
+        const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+        if (!match) return 0;
+
+        const hours = parseInt(match[1] || 0);
+        const minutes = parseInt(match[2] || 0);
+        const seconds = parseInt(match[3] || 0);
+
+        return hours * 3600 + minutes * 60 + seconds;
     }
 
     async getSpotifyData(url) {
