@@ -218,34 +218,37 @@ class RankingManager {
     }
 
     async getYouTubeVideoDuration(videoId) {
-        // Try multiple Invidious API instances (YouTube proxies that bypass CORS)
-        const invidiousInstances = [
-            'https://inv.nadeko.net/api/v1/videos/',
-            'https://invidious.jing.rocks/api/v1/videos/',
-            'https://yt.artemislena.eu/api/v1/videos/',
-            'https://invidious.flokinet.to/api/v1/videos/'
-        ];
+        // Try using CORS proxy to fetch YouTube page
+        try {
+            const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
 
-        for (const instance of invidiousInstances) {
-            try {
-                const url = `${instance}${videoId}`;
-                const response = await fetch(url);
+            const response = await fetch(proxyUrl);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.lengthSeconds) {
-                        const duration = parseInt(data.lengthSeconds);
-                        console.log(`Found duration for video ${videoId}: ${duration} seconds (via ${instance})`);
-                        return duration;
-                    }
+            if (response.ok) {
+                const html = await response.text();
+
+                // Try to extract duration from the page
+                const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
+                if (durationMatch && durationMatch[1]) {
+                    const duration = parseInt(durationMatch[1]);
+                    console.log(`Found duration for video ${videoId}: ${duration} seconds`);
+                    return duration;
                 }
-            } catch (error) {
-                // Try next instance
-                continue;
+
+                // Alternative: Try to find in approxDurationMs
+                const approxMatch = html.match(/"approxDurationMs":"(\d+)"/);
+                if (approxMatch && approxMatch[1]) {
+                    const duration = Math.floor(parseInt(approxMatch[1]) / 1000);
+                    console.log(`Found duration for video ${videoId}: ${duration} seconds (from approxDurationMs)`);
+                    return duration;
+                }
             }
+        } catch (error) {
+            console.log(`Could not fetch duration for video ${videoId}:`, error.message);
         }
 
-        console.log(`Could not fetch duration for video ${videoId}, using default: 240 seconds`);
+        console.log(`Using default duration for video ${videoId}: 240 seconds`);
         return 240; // 4 minutes default
     }
 
