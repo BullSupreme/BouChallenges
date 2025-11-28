@@ -21,15 +21,24 @@ class RankingManager {
     initializeDefaults() {
         // Create 5 default empty ranking slots
         return [
-            { rank: 1, title: '', artist: '', platform: '', thumbnailUrl: '' },
-            { rank: 2, title: '', artist: '', platform: '', thumbnailUrl: '' },
-            { rank: 3, title: '', artist: '', platform: '', thumbnailUrl: '' },
-            { rank: 4, title: '', artist: '', platform: '', thumbnailUrl: '' },
-            { rank: 5, title: '', artist: '', platform: '', thumbnailUrl: '' }
+            { rank: 1, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
+            { rank: 2, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
+            { rank: 3, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
+            { rank: 4, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 },
+            { rank: 5, title: '', artist: '', platform: '', thumbnailUrl: '', duration: 0 }
         ];
     }
 
     init() {
+        // Ensure all items have duration property
+        this.items = this.items.map(item => {
+            if (!item.hasOwnProperty('duration')) {
+                item.duration = item.platform === 'YouTube' ? 300 : 0;
+            }
+            return item;
+        });
+        this.saveItems();
+
         // Setup playback controls
         this.setupPlaybackControls();
         // Initial render
@@ -691,9 +700,11 @@ class RankingManager {
 
         // Setup auto-advance
         const item = this.items[index];
-        if (item.platform === 'YouTube' && item.duration) {
+        if (item.platform === 'YouTube') {
+            // Use duration if available (in seconds), default to 5 minutes
+            const videoDuration = item.duration || 300;
             // Calculate duration + 2 second buffer for safety
-            const autoAdvanceDelay = (item.duration + 2) * 1000;
+            const autoAdvanceDelay = (videoDuration + 2) * 1000;
 
             // Clear any existing timer
             if (this.playbackTimer) {
@@ -703,6 +714,8 @@ class RankingManager {
             this.playbackTimer = setTimeout(() => {
                 this.advancePlaylist();
             }, autoAdvanceDelay);
+
+            console.log(`Auto-advance in ${videoDuration + 2} seconds for: ${item.title}`);
         }
 
         this.updatePlaybackUI();
@@ -774,7 +787,8 @@ class RankingManager {
             title: '',
             artist: '',
             platform: '',
-            thumbnailUrl: ''
+            thumbnailUrl: '',
+            duration: 0
         });
         this.saveItems();
         this.renderItems();
@@ -804,7 +818,8 @@ class RankingManager {
             artist: '',
             platform: '',
             thumbnailUrl: '',
-            url: ''
+            url: '',
+            duration: 0
         };
         this.saveItems();
         this.renderItems();
