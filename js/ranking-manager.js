@@ -218,50 +218,34 @@ class RankingManager {
     }
 
     async getYouTubeVideoDuration(videoId) {
-        try {
-            // Fetch the YouTube page to extract duration from structured data
-            const pageUrl = `https://www.youtube.com/watch?v=${videoId}`;
-            const response = await fetch(pageUrl);
+        // Try multiple Invidious API instances (YouTube proxies that bypass CORS)
+        const invidiousInstances = [
+            'https://inv.nadeko.net/api/v1/videos/',
+            'https://invidious.jing.rocks/api/v1/videos/',
+            'https://yt.artemislena.eu/api/v1/videos/',
+            'https://invidious.flokinet.to/api/v1/videos/'
+        ];
 
-            if (!response.ok) {
-                console.log('Failed to fetch YouTube page');
-                return 240;
-            }
+        for (const instance of invidiousInstances) {
+            try {
+                const url = `${instance}${videoId}`;
+                const response = await fetch(url);
 
-            const html = await response.text();
-
-            // Try to extract duration from JSON-LD structured data
-            // YouTube embeds video metadata in <script type="application/ld+json">
-            const jsonLdMatch = html.match(/<script type="application\/ld\+json">(.*?)<\/script>/s);
-            if (jsonLdMatch && jsonLdMatch[1]) {
-                try {
-                    const data = JSON.parse(jsonLdMatch[1]);
-                    if (data.duration) {
-                        // Duration is in ISO 8601 format like "PT4M33S" (4 minutes 33 seconds)
-                        const duration = this.parseISO8601Duration(data.duration);
-                        if (duration > 0) {
-                            console.log(`Found duration for video ${videoId}: ${duration} seconds`);
-                            return duration;
-                        }
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.lengthSeconds) {
+                        const duration = parseInt(data.lengthSeconds);
+                        console.log(`Found duration for video ${videoId}: ${duration} seconds (via ${instance})`);
+                        return duration;
                     }
-                } catch (e) {
-                    console.log('Error parsing JSON-LD data:', e);
                 }
+            } catch (error) {
+                // Try next instance
+                continue;
             }
-
-            // Fallback: Try to find duration in meta tags or other locations
-            const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
-            if (durationMatch && durationMatch[1]) {
-                const duration = parseInt(durationMatch[1]);
-                console.log(`Found duration for video ${videoId}: ${duration} seconds`);
-                return duration;
-            }
-
-        } catch (error) {
-            console.log('Could not fetch YouTube duration:', error);
         }
 
-        console.log(`Using default duration for video ${videoId}: 240 seconds`);
+        console.log(`Could not fetch duration for video ${videoId}, using default: 240 seconds`);
         return 240; // 4 minutes default
     }
 
