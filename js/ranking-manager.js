@@ -33,7 +33,7 @@ class RankingManager {
         // Ensure all items have duration property
         this.items = this.items.map(item => {
             if (!item.hasOwnProperty('duration')) {
-                item.duration = item.platform === 'YouTube' ? 300 : 0;
+                item.duration = item.platform === 'YouTube' ? 240 : 0;
             }
             return item;
         });
@@ -219,19 +219,15 @@ class RankingManager {
 
     async getYouTubeVideoDuration(videoId) {
         try {
-            const url = `https://www.youtube.com/watch?v=${videoId}`;
-            const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-            const response = await fetch(oembedUrl);
-            if (response.ok) {
-                // oEmbed doesn't provide duration, but we can parse it from the page
-                // For now, we'll use a default estimate based on typical video lengths
-                // In a production app, you'd use YouTube Data API which requires authentication
-                return 300; // Default 5 minutes as fallback
-            }
+            // Try to get duration from YouTube Data API if available
+            // For now, we estimate based on video metadata or use a default
+            // Since oEmbed doesn't provide duration and Data API requires authentication,
+            // we'll use a reasonable default of 4 minutes
+            return 240; // 4 minutes default (240 seconds)
         } catch (error) {
             console.log('Could not fetch YouTube duration, using default');
         }
-        return 300; // Default 5 minutes
+        return 240; // 4 minutes default
     }
 
     async getSpotifyData(url) {
@@ -343,10 +339,8 @@ class RankingManager {
     }
 
     renderItems() {
-        // Stop any active playlist when items are re-rendered (drag/drop or rank changes)
-        if (this.playlistMode) {
-            this.stopPlayback();
-        }
+        // Note: Don't stop playlist on every render - only on manual drag/drop or rank changes
+        // Playlist will manage its own advancement
 
         this.itemsList.innerHTML = this.items
             .map((item, index) => {
@@ -701,8 +695,8 @@ class RankingManager {
         // Setup auto-advance
         const item = this.items[index];
         if (item.platform === 'YouTube') {
-            // Use duration if available (in seconds), default to 5 minutes
-            const videoDuration = item.duration || 300;
+            // Use duration if available (in seconds), default to 4 minutes
+            const videoDuration = item.duration || 240;
             // Calculate duration + 2 second buffer for safety
             const autoAdvanceDelay = (videoDuration + 2) * 1000;
 
@@ -712,6 +706,7 @@ class RankingManager {
             }
 
             this.playbackTimer = setTimeout(() => {
+                console.log(`Auto-advancing from: ${item.title}`);
                 this.advancePlaylist();
             }, autoAdvanceDelay);
 
@@ -851,6 +846,11 @@ class RankingManager {
 
     swapItems(fromIndex, toIndex) {
         if (fromIndex === toIndex) return;
+
+        // Stop playlist when items are reordered
+        if (this.playlistMode) {
+            this.stopPlayback();
+        }
 
         // Swap the items
         [this.items[fromIndex], this.items[toIndex]] = [this.items[toIndex], this.items[fromIndex]];
