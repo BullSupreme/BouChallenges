@@ -976,11 +976,28 @@ class RankingManager {
                         ${this.escapeHtml(displayText)}
                         ${externalButton}
                     </div>
-                    <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}" style="flex: 1;">
+                        ${item.duration && item.platform === 'YouTube' ? `<span class="video-duration" style="font-size: 0.75em; color: #94a3b8; white-space: nowrap;">${this.formatDuration(item.duration)}</span>` : ''}
+                    </div>
                 </div>
                 <button class="remove-btn" data-index="${index}">×</button>
             </div>
         `;
+    }
+
+    formatDuration(seconds) {
+        if (!seconds || seconds === 0) return '';
+
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+
+        if (hours > 0) {
+            return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        } else {
+            return `${minutes}:${secs.toString().padStart(2, '0')}`;
+        }
     }
 
     escapeHtml(text) {
