@@ -114,7 +114,6 @@ body {
 /* Header */
 header {
     text-align: center;
-    margin-bottom: 40px;
     padding: 30px 0;
     animation: slide-up 0.8s ease-out;
 }

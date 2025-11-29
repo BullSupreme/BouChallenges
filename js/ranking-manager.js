@@ -1086,7 +1086,6 @@ class RankingManager {
             indicator = document.createElement('div');
             indicator.id = 'duplicateIndicator';
             indicator.style.cssText = `
-                margin-top: 15px;
                 padding: 12px;
                 background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
                 border-radius: 8px;
