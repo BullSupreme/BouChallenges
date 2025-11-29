@@ -1195,21 +1195,25 @@ class RankingManager {
         // Find the song-item with the matching rank
         const rankItems = this.itemsList.querySelectorAll('.song-item');
         for (const item of rankItems) {
-            const rankElement = item.querySelector('.rank-number');
-            if (rankElement && parseInt(rankElement.textContent) === rank) {
-                // Scroll to the item
-                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const rankElement = item.querySelector('.song-rank');
+            if (rankElement) {
+                const rankText = rankElement.textContent.replace('#', '').trim();
+                const itemRank = parseInt(rankText);
+                if (itemRank === rank) {
+                    // Scroll to the item
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                // Add temporary highlight effect
-                const originalBackground = item.style.background;
-                item.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%)';
-                item.style.transition = 'background 0.3s ease';
+                    // Add temporary highlight effect
+                    const originalBackground = item.style.background;
+                    item.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%)';
+                    item.style.transition = 'background 0.3s ease';
 
-                setTimeout(() => {
-                    item.style.background = originalBackground;
-                }, 2000);
+                    setTimeout(() => {
+                        item.style.background = originalBackground;
+                    }, 2000);
 
-                break;
+                    break;
+                }
             }
         }
     }
