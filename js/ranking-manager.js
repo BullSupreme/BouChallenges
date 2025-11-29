@@ -1173,13 +1173,19 @@ class RankingManager {
                                 <span style="color: #cbd5e1; font-size: 0.9em;">${dup.reason}</span>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px;">
-                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; text-decoration: underline;" onclick="window.rankingManager.scrollToRank(${dup.rank1})">Rank #${dup.rank1}</div>
+                                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;"
+                                     onmouseover="this.style.background='rgba(168, 85, 247, 0.2)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)';"
+                                     onmouseout="this.style.background='rgba(0,0,0,0.3)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                                     onclick="window.rankingManager.scrollToRank(${dup.rank1})">
+                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px; text-decoration: underline;">Rank #${dup.rank1}</div>
                                     <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${this.escapeHtml(dup.title1)}</div>
                                     <div style="color: #cbd5e1; font-size: 0.9em;">${this.escapeHtml(dup.artist1)}</div>
                                 </div>
-                                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px;">
-                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; text-decoration: underline;" onclick="window.rankingManager.scrollToRank(${dup.rank2})">Rank #${dup.rank2}</div>
+                                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;"
+                                     onmouseover="this.style.background='rgba(168, 85, 247, 0.2)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(168, 85, 247, 0.3)';"
+                                     onmouseout="this.style.background='rgba(0,0,0,0.3)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+                                     onclick="window.rankingManager.scrollToRank(${dup.rank2})">
+                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px; text-decoration: underline;">Rank #${dup.rank2}</div>
                                     <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${this.escapeHtml(dup.title2)}</div>
                                     <div style="color: #cbd5e1; font-size: 0.9em;">${this.escapeHtml(dup.artist2)}</div>
                                 </div>
