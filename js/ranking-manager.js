@@ -7,6 +7,8 @@ class RankingManager {
         this.challengeType = challengeType;
         this.items = JSON.parse(localStorage.getItem(this.storageKey)) || this.initializeDefaults();
         this.itemsList = document.getElementById('songsList');
+        // Make instance globally available for onclick handlers
+        window.rankingManager = this;
         this.init();
     }
 
@@ -1172,12 +1174,12 @@ class RankingManager {
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                 <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px;">
-                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px;">Rank #${dup.rank1}</div>
+                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; text-decoration: underline;" onclick="window.rankingManager.scrollToRank(${dup.rank1})">Rank #${dup.rank1}</div>
                                     <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${this.escapeHtml(dup.title1)}</div>
                                     <div style="color: #cbd5e1; font-size: 0.9em;">${this.escapeHtml(dup.artist1)}</div>
                                 </div>
                                 <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px;">
-                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px;">Rank #${dup.rank2}</div>
+                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px; cursor: pointer; text-decoration: underline;" onclick="window.rankingManager.scrollToRank(${dup.rank2})">Rank #${dup.rank2}</div>
                                     <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${this.escapeHtml(dup.title2)}</div>
                                     <div style="color: #cbd5e1; font-size: 0.9em;">${this.escapeHtml(dup.artist2)}</div>
                                 </div>
@@ -1186,6 +1188,29 @@ class RankingManager {
                     `).join('')}
                 </div>
             `;
+        }
+    }
+
+    scrollToRank(rank) {
+        // Find the song-item with the matching rank
+        const rankItems = this.itemsList.querySelectorAll('.song-item');
+        for (const item of rankItems) {
+            const rankElement = item.querySelector('.rank-number');
+            if (rankElement && parseInt(rankElement.textContent) === rank) {
+                // Scroll to the item
+                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Add temporary highlight effect
+                const originalBackground = item.style.background;
+                item.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%)';
+                item.style.transition = 'background 0.3s ease';
+
+                setTimeout(() => {
+                    item.style.background = originalBackground;
+                }, 2000);
+
+                break;
+            }
         }
     }
 }
