@@ -24,6 +24,8 @@ class RankingManager {
     init() {
         // Initial render
         this.renderItems();
+        // Setup duplicate detection
+        this.setupDuplicateDetection();
     }
 
     // Parse URL and extract metadata (YouTube/Spotify specific)
@@ -373,6 +375,10 @@ class RankingManager {
             });
         });
 
+        // Update duplicate detection after rendering
+        if (typeof this.updateDuplicateDisplay === 'function') {
+            this.updateDuplicateDisplay();
+        }
     }
 
     playItem(index) {
@@ -962,5 +968,224 @@ class RankingManager {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+    }
+
+    // Duplicate Detection Methods
+    levenshteinDistance(str1, str2) {
+        // Calculate edit distance between two strings
+        const len1 = str1.length;
+        const len2 = str2.length;
+        const matrix = [];
+
+        for (let i = 0; i <= len1; i++) {
+            matrix[i] = [i];
+        }
+        for (let j = 0; j <= len2; j++) {
+            matrix[0][j] = j;
+        }
+
+        for (let i = 1; i <= len1; i++) {
+            for (let j = 1; j <= len2; j++) {
+                if (str1[i - 1] === str2[j - 1]) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+                }
+            }
+        }
+
+        return matrix[len1][len2];
+    }
+
+    stringSimilarity(str1, str2) {
+        // Returns similarity percentage (0-100)
+        if (!str1 || !str2) return 0;
+
+        const s1 = str1.toLowerCase().trim();
+        const s2 = str2.toLowerCase().trim();
+
+        if (s1 === s2) return 100;
+
+        const distance = this.levenshteinDistance(s1, s2);
+        const maxLen = Math.max(s1.length, s2.length);
+
+        return Math.round(((maxLen - distance) / maxLen) * 100);
+    }
+
+    detectDuplicates() {
+        const duplicates = [];
+        const items = this.items.filter(item => item.title && item.title.trim());
+
+        for (let i = 0; i < items.length; i++) {
+            for (let j = i + 1; j < items.length; j++) {
+                const item1 = items[i];
+                const item2 = items[j];
+
+                const titleSimilarity = this.stringSimilarity(item1.title, item2.title);
+                const artistSimilarity = this.stringSimilarity(item1.artist, item2.artist);
+
+                let severity = null;
+                let reason = '';
+
+                // RED: 98%+ match on title (exact or near-exact duplicates)
+                if (titleSimilarity >= 98) {
+                    severity = 'red';
+                    reason = `Exact title match (${titleSimilarity}% similar)`;
+                }
+                // ORANGE: Partial match - same artist + similar title (70%+) OR same title + different artist
+                else if (artistSimilarity >= 90 && titleSimilarity >= 70) {
+                    severity = 'orange';
+                    reason = `Same artist, similar title (${titleSimilarity}% similar)`;
+                }
+                else if (titleSimilarity >= 90 && artistSimilarity < 70 && item1.artist && item2.artist) {
+                    severity = 'orange';
+                    reason = `Same title, different artist`;
+                }
+                // YELLOW: Possible match - same artist OR similar title (60-89%)
+                else if (artistSimilarity >= 90) {
+                    severity = 'yellow';
+                    reason = `Same artist`;
+                }
+                else if (titleSimilarity >= 60 && titleSimilarity < 90) {
+                    severity = 'yellow';
+                    reason = `Similar title (${titleSimilarity}% similar)`;
+                }
+
+                if (severity) {
+                    duplicates.push({
+                        rank1: item1.rank,
+                        rank2: item2.rank,
+                        title1: item1.title,
+                        title2: item2.title,
+                        artist1: item1.artist || 'N/A',
+                        artist2: item2.artist || 'N/A',
+                        severity: severity,
+                        reason: reason,
+                        similarity: Math.max(titleSimilarity, artistSimilarity)
+                    });
+                }
+            }
+        }
+
+        return duplicates;
+    }
+
+    setupDuplicateDetection() {
+        // Create indicator at top
+        const header = document.querySelector('header');
+        if (!header) return;
+
+        let indicator = document.getElementById('duplicateIndicator');
+        if (!indicator) {
+            indicator = document.createElement('div');
+            indicator.id = 'duplicateIndicator';
+            indicator.style.cssText = `
+                margin-top: 15px;
+                padding: 12px;
+                background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+                border-radius: 8px;
+                border: 2px solid #334155;
+                display: flex;
+                gap: 15px;
+                align-items: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            `;
+            indicator.onclick = () => {
+                document.getElementById('duplicatesSection')?.scrollIntoView({ behavior: 'smooth' });
+            };
+            header.appendChild(indicator);
+        }
+
+        // Create duplicates section at bottom
+        let duplicatesSection = document.getElementById('duplicatesSection');
+        if (!duplicatesSection) {
+            duplicatesSection = document.createElement('div');
+            duplicatesSection.id = 'duplicatesSection';
+            duplicatesSection.style.cssText = `
+                margin-top: 40px;
+                padding: 20px;
+                background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+                border-radius: 10px;
+                border: 2px solid #334155;
+            `;
+
+            const footer = document.querySelector('footer');
+            if (footer && footer.parentNode) {
+                footer.parentNode.insertBefore(duplicatesSection, footer);
+            }
+        }
+
+        this.updateDuplicateDisplay();
+    }
+
+    updateDuplicateDisplay() {
+        const duplicates = this.detectDuplicates();
+        const indicator = document.getElementById('duplicateIndicator');
+        const section = document.getElementById('duplicatesSection');
+
+        if (!indicator || !section) return;
+
+        const redCount = duplicates.filter(d => d.severity === 'red').length;
+        const orangeCount = duplicates.filter(d => d.severity === 'orange').length;
+        const yellowCount = duplicates.filter(d => d.severity === 'yellow').length;
+
+        // Update indicator
+        if (duplicates.length === 0) {
+            indicator.innerHTML = `<span style="color: #10b981; font-weight: 600;">✓ No duplicates detected</span>`;
+            section.style.display = 'none';
+        } else {
+            indicator.innerHTML = `
+                <span style="color: #cbd5e1; font-weight: 600;">⚠ Potential Duplicates:</span>
+                ${redCount > 0 ? `<span style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 5px; font-weight: 600;">${redCount} Exact</span>` : ''}
+                ${orangeCount > 0 ? `<span style="background: #ea580c; color: white; padding: 4px 12px; border-radius: 5px; font-weight: 600;">${orangeCount} Partial</span>` : ''}
+                ${yellowCount > 0 ? `<span style="background: #eab308; color: white; padding: 4px 12px; border-radius: 5px; font-weight: 600;">${yellowCount} Possible</span>` : ''}
+                <span style="color: #94a3b8; font-size: 0.9em; margin-left: auto;">Click to view details ↓</span>
+            `;
+            section.style.display = 'block';
+
+            // Update section content
+            section.innerHTML = `
+                <h3 style="color: #f1f5f9; margin-bottom: 20px; font-size: 1.5em;">Duplicate Detection Results</h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    ${duplicates.map(dup => `
+                        <div style="
+                            background: ${dup.severity === 'red' ? '#7f1d1d' : dup.severity === 'orange' ? '#7c2d12' : '#713f12'};
+                            border-left: 4px solid ${dup.severity === 'red' ? '#dc2626' : dup.severity === 'orange' ? '#ea580c' : '#eab308'};
+                            padding: 15px;
+                            border-radius: 8px;
+                        ">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                <span style="
+                                    background: ${dup.severity === 'red' ? '#dc2626' : dup.severity === 'orange' ? '#ea580c' : '#eab308'};
+                                    color: white;
+                                    padding: 4px 10px;
+                                    border-radius: 5px;
+                                    font-size: 0.85em;
+                                    font-weight: 600;
+                                ">${dup.severity.toUpperCase()}</span>
+                                <span style="color: #cbd5e1; font-size: 0.9em;">${dup.reason}</span>
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px;">
+                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px;">Rank #${dup.rank1}</div>
+                                    <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${this.escapeHtml(dup.title1)}</div>
+                                    <div style="color: #cbd5e1; font-size: 0.9em;">${this.escapeHtml(dup.artist1)}</div>
+                                </div>
+                                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px;">
+                                    <div style="color: #94a3b8; font-size: 0.85em; margin-bottom: 5px;">Rank #${dup.rank2}</div>
+                                    <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${this.escapeHtml(dup.title2)}</div>
+                                    <div style="color: #cbd5e1; font-size: 0.9em;">${this.escapeHtml(dup.artist2)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
     }
 }
