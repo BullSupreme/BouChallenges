@@ -929,33 +929,13 @@ class RankingManager {
                 </div>
             </div>`;
                 } else {
-                  // Check if it's a YouTube video
-                  const isYouTube = item.platform === 'YouTube' && item.videoId;
+                  const platformHtml = item.url
+                    ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.url}</a>`
+                    : item.platform;
 
-                  if (isYouTube) {
-                    // Embed YouTube iframe for playable videos
-                    return `
-            <div class="song-item ${rankClass}">
-                <div class="song-rank">#${item.rank}</div>
-                <div style="width: 100%; display: flex; flex-direction: column; gap: 10px;">
-                    <iframe width="100%" height="315" src="https://www.youtube.com/embed/${item.videoId}"
-                            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen style="border-radius: 8px;"></iframe>
-                    <div class="song-info">
-                        <div class="song-title">${this.escapeHtml(item.title)}</div>
-                        <div class="song-artist">${this.escapeHtml(item.artist)}</div>
-                        <div class="song-platform"><a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.url}</a></div>
-                    </div>
-                </div>
-            </div>`;
-                  } else {
-                    // For non-YouTube items, show thumbnail and link
-                    const platformHtml = item.url
-                      ? `<a href="${item.url}" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">${item.url}</a>`
-                      : item.platform;
-
-                    const onclickAttr = item.url ? ` onclick="window.open('${item.url}', '_blank');"` : '';
-                    return `
+                  // Add onclick to open URL if it exists
+                  const onclickAttr = item.url ? ` onclick="window.open('${item.url}', '_blank');"` : '';
+                  return `
             <div class="song-item ${rankClass}"${onclickAttr}>
                 <div class="song-rank">#${item.rank}</div>
                 <img src="${item.thumbnailUrl}" alt="${item.title}" class="song-thumbnail">
@@ -965,7 +945,6 @@ class RankingManager {
                     <div class="song-platform">${platformHtml}</div>
                 </div>
             </div>`;
-                  }
                 }
               })
               .join('')}
