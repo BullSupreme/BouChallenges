@@ -1286,47 +1286,39 @@ class RankingManager {
     }
 
     async setupCommunityBrowser() {
-        // Create left sidebar for community rankings
-        const main = document.querySelector('main');
-        if (!main || document.getElementById('communitySection')) return;
+        // Create independent left sidebar (not inside main container)
+        const body = document.body;
+        if (document.getElementById('communitySection')) return;
 
-        // Create sidebar container
-        const sidebarContainer = document.createElement('div');
-        sidebarContainer.style.cssText = `
-            display: grid;
-            grid-template-columns: 250px 1fr;
-            gap: 20px;
-            width: 100%;
-            margin: 0 auto;
-        `;
+        // Get container width to adjust body layout
+        const container = document.querySelector('.container');
+        if (!container) return;
 
-        // Move existing main content into right column
-        const rightColumn = document.createElement('div');
-        while (main.firstChild) {
-            rightColumn.appendChild(main.firstChild);
-        }
-
-        // Create left sidebar
+        // Create left sidebar outside of main content
         const communitySection = document.createElement('div');
         communitySection.id = 'communitySection';
         communitySection.style.cssText = `
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
             padding: 20px;
             background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
-            border-radius: 10px;
-            border: 2px solid #334155;
-            height: fit-content;
-            position: sticky;
-            top: 20px;
+            border-right: 2px solid #334155;
+            overflow-y: auto;
+            z-index: 100;
         `;
 
         communitySection.innerHTML = `
-            <h3 style="color: #f1f5f9; margin-bottom: 15px; font-size: 1.1em; text-align: center;">Community Rankings</h3>
+            <h3 style="color: #f1f5f9; margin-bottom: 15px; font-size: 1.2em; text-align: center; margin-top: 50px;">Community Rankings</h3>
             <div id="communityUsers" style="display: flex; flex-direction: column; gap: 8px;"></div>
         `;
 
-        sidebarContainer.appendChild(communitySection);
-        sidebarContainer.appendChild(rightColumn);
-        main.appendChild(sidebarContainer);
+        body.insertBefore(communitySection, body.firstChild);
+
+        // Shift main container to the right
+        container.style.marginLeft = '280px';
 
         // Fetch and display users
         const users = await this.fetchCommunityRankings();
