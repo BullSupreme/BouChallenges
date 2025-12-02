@@ -1403,6 +1403,22 @@ class RankingManager {
         this.displayUserRankingModal(username, htmlContent, categoryTitle);
     }
 
+    extractYouTubeVideoId(url) {
+        // Extract video ID from various YouTube URL formats
+        const patterns = [
+            /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+            /^([a-zA-Z0-9_-]{11})$/ // 11-char video ID
+        ];
+
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match) {
+                return match[1];
+            }
+        }
+        return null;
+    }
+
     displayUserRankingModal(username, htmlContent, categoryTitle) {
         // Create modal
         const modal = document.createElement('div');
@@ -1448,14 +1464,27 @@ class RankingManager {
             // Extract just the URL text for display
             const urlDisplay = platformLink.startsWith('http') ? platformLink : '';
 
+            // Check if it's a YouTube link and extract video ID
+            const videoId = this.extractYouTubeVideoId(platformLink);
+            const isYouTube = videoId !== null;
+
             itemsHTML += `
-                <div style="display: grid; grid-template-columns: 60px 100px 1fr; gap: 15px; align-items: start; padding: 10px 0; border-bottom: 1px solid #334155;">
-                    <div style="font-size: 1.3em; font-weight: 700; color: #a855f7; text-align: center;">${rank}</div>
-                    ${thumbnail ? `<img src="${thumbnail}" alt="${title}" style="width: 100%; aspect-ratio: 1; border-radius: 5px; object-fit: cover; cursor: pointer;" onclick="window.open('${platformLink}', '_blank');">` : '<div></div>'}
-                    <div>
-                        <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${title}</div>
-                        ${urlDisplay ? `<a href="${platformLink}" target="_blank" style="color: #a855f7; font-size: 0.85em; text-decoration: none; font-weight: 500; word-break: break-all;">${platformLink}</a>` : ''}
+                <div style="display: flex; flex-direction: column; gap: 10px; padding: 15px 0; border-bottom: 1px solid #334155;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="font-size: 1.3em; font-weight: 700; color: #a855f7; min-width: 40px; text-align: center;">${rank}</div>
+                        <div style="color: #f1f5f9; font-weight: 600;">${title}</div>
                     </div>
+                    ${isYouTube ? `
+                        <div style="width: 100%; max-width: 400px;">
+                            <iframe width="100%" height="225" src="https://www.youtube.com/embed/${videoId}"
+                                    frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen
+                                    style="border-radius: 5px;">
+                            </iframe>
+                        </div>
+                    ` : (thumbnail ? `<img src="${thumbnail}" alt="${title}" style="max-width: 300px; border-radius: 5px; object-fit: cover; cursor: pointer;" onclick="window.open('${platformLink}', '_blank');">` : '')}
+                    ${urlDisplay ? `<a href="${platformLink}" target="_blank" style="color: #a855f7; font-size: 0.85em; text-decoration: none; font-weight: 500; word-break: break-all;">${platformLink}</a>` : ''}
                 </div>
             `;
         });
