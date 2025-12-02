@@ -1423,7 +1423,6 @@ class RankingManager {
         items.forEach((item) => {
             const rank = item.querySelector('.song-rank')?.textContent || '#?';
             const title = item.querySelector('.song-title')?.textContent || '';
-            const artist = item.querySelector('.song-artist')?.textContent?.trim() || '';
             const thumbnail = item.querySelector('.song-thumbnail')?.src || '';
             const platformLink = item.querySelector('.song-platform a')?.href || item.querySelector('.song-platform')?.textContent || '';
 
@@ -1436,7 +1435,6 @@ class RankingManager {
                     ${thumbnail ? `<img src="${thumbnail}" alt="${title}" style="width: 100%; aspect-ratio: 1; border-radius: 5px; object-fit: cover; cursor: pointer;" onclick="window.open('${platformLink}', '_blank');">` : '<div></div>'}
                     <div>
                         <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${title}</div>
-                        ${artist ? `<div style="color: #cbd5e1; font-size: 0.9em; margin-bottom: 4px;">${artist}</div>` : ''}
                         ${urlDisplay ? `<a href="${platformLink}" target="_blank" style="color: #a855f7; font-size: 0.85em; text-decoration: none; font-weight: 500; word-break: break-all;">${platformLink}</a>` : ''}
                     </div>
                 </div>
