@@ -1286,26 +1286,47 @@ class RankingManager {
     }
 
     async setupCommunityBrowser() {
-        // Create community rankings section
-        const container = document.querySelector('.songs-list') || document.getElementById('songsList');
-        if (!container || document.getElementById('communitySection')) return;
+        // Create left sidebar for community rankings
+        const main = document.querySelector('main');
+        if (!main || document.getElementById('communitySection')) return;
 
+        // Create sidebar container
+        const sidebarContainer = document.createElement('div');
+        sidebarContainer.style.cssText = `
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+            width: 100%;
+            margin: 0 auto;
+        `;
+
+        // Move existing main content into right column
+        const rightColumn = document.createElement('div');
+        while (main.firstChild) {
+            rightColumn.appendChild(main.firstChild);
+        }
+
+        // Create left sidebar
         const communitySection = document.createElement('div');
         communitySection.id = 'communitySection';
         communitySection.style.cssText = `
-            margin-top: 40px;
             padding: 20px;
             background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
             border-radius: 10px;
             border: 2px solid #334155;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
         `;
 
         communitySection.innerHTML = `
-            <h3 style="color: #f1f5f9; margin-bottom: 15px; font-size: 1.3em;">Community Rankings</h3>
-            <div id="communityUsers" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;"></div>
+            <h3 style="color: #f1f5f9; margin-bottom: 15px; font-size: 1.1em; text-align: center;">Community Rankings</h3>
+            <div id="communityUsers" style="display: flex; flex-direction: column; gap: 8px;"></div>
         `;
 
-        container.parentNode.insertBefore(communitySection, container.nextSibling);
+        sidebarContainer.appendChild(communitySection);
+        sidebarContainer.appendChild(rightColumn);
+        main.appendChild(sidebarContainer);
 
         // Fetch and display users
         const users = await this.fetchCommunityRankings();
