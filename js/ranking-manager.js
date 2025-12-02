@@ -1322,6 +1322,9 @@ class RankingManager {
         // Shift main container to the right
         container.style.marginLeft = '280px';
 
+        // Get current category from page
+        const categoryTitle = document.querySelector('.songs-list h2')?.textContent?.trim() || 'Rankings';
+
         // Fetch and display users
         const users = await this.fetchCommunityRankings();
         const communityUsers = document.getElementById('communityUsers');
@@ -1331,7 +1334,21 @@ class RankingManager {
             return;
         }
 
+        // Filter users to only show those with files for this category
+        const usersWithCategory = [];
         for (const username of users) {
+            const files = await this.getCategoryFilesForUser(username, categoryTitle);
+            if (files.length > 0) {
+                usersWithCategory.push(username);
+            }
+        }
+
+        if (usersWithCategory.length === 0) {
+            communityUsers.innerHTML = '<p style="color: #cbd5e1;">No submissions for this category</p>';
+            return;
+        }
+
+        for (const username of usersWithCategory) {
             const userCard = document.createElement('div');
             userCard.style.cssText = `
                 padding: 12px;
