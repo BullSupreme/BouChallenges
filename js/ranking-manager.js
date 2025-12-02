@@ -1259,9 +1259,11 @@ class RankingManager {
 
             const files = await response.json();
             // Filter for files matching the category
+            // Replace "/" with "_" and remove spaces to match filename format
+            const categoryMatch = categoryName.toLowerCase().replace(/\s+/g, '').replace(/\//g, '_');
             return files.filter(item =>
                 item.type === 'file' &&
-                item.name.toLowerCase().includes(categoryName.toLowerCase().replace(/\s+/g, ''))
+                item.name.toLowerCase().includes(categoryMatch)
             );
         } catch (error) {
             console.log('Could not fetch category files:', error);
