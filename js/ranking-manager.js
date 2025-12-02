@@ -1476,13 +1476,11 @@ class RankingManager {
                         <div style="color: #f1f5f9; font-weight: 600;">${title}</div>
                     </div>
                     ${isYouTube ? `
-                        <div style="width: 100%; max-width: 400px;">
-                            <iframe width="100%" height="225" src="https://www.youtube.com/embed/${videoId}"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                    allowfullscreen
-                                    style="border-radius: 5px;">
-                            </iframe>
+                        <div style="width: 100%; max-width: 400px; position: relative; aspect-ratio: 16/9; background: #0f172a; border-radius: 5px; overflow: hidden;">
+                            <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg" alt="thumbnail" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" class="yt-thumbnail" onclick="this.parentElement.innerHTML = '<iframe width=\\'100%\\' height=\\'100%\\' src=\\'https://www.youtube.com/embed/${videoId}?autoplay=1\\' frameborder=\\'0\\' allow=\\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\\' allowfullscreen style=\\'position: absolute; top: 0; left: 0;\\' loading=\\'lazy\\'></iframe>';" style="display: block;">
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 60px; height: 60px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none;">
+                                <div style="width: 0; height: 0; border-left: 20px solid white; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px;"></div>
+                            </div>
                         </div>
                     ` : (thumbnail ? `<img src="${thumbnail}" alt="${title}" style="max-width: 300px; border-radius: 5px; object-fit: cover; cursor: pointer;" onclick="window.open('${platformLink}', '_blank');">` : '')}
                     ${urlDisplay ? `<a href="${platformLink}" target="_blank" style="color: #a855f7; font-size: 0.85em; text-decoration: none; font-weight: 500; word-break: break-all;">${platformLink}</a>` : ''}
