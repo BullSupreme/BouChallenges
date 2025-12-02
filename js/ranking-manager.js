@@ -1684,13 +1684,13 @@ class RankingManager {
                                 <div style="color: #f1f5f9; font-weight: 600; font-size: 0.95em;">${item1.title}</div>
                             </div>
                             ${item1.isYouTube ? `
-                                <div style="width: 100%; position: relative; aspect-ratio: 16/9; background: #0f172a; border-radius: 5px; overflow: hidden;">
+                                <div style="width: 90%; position: relative; aspect-ratio: 16/9; background: #0f172a; border-radius: 5px; overflow: hidden;">
                                     <img src="https://img.youtube.com/vi/${item1.videoId}/maxresdefault.jpg" alt="thumbnail" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="this.parentElement.innerHTML = '<iframe width=\\'100%\\' height=\\'100%\\' src=\\'https://www.youtube.com/embed/${item1.videoId}?autoplay=1\\' frameborder=\\'0\\' allow=\\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\\' allowfullscreen style=\\'position: absolute; top: 0; left: 0;\\' loading=\\'lazy\\'></iframe>';" style="display: block;">
-                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none;">
-                                        <div style="width: 0; height: 0; border-left: 16px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 3px;"></div>
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 45px; height: 45px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none;">
+                                        <div style="width: 0; height: 0; border-left: 14px solid white; border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 2px;"></div>
                                     </div>
                                 </div>
-                            ` : (item1.thumbnail ? `<img src="${item1.thumbnail}" alt="${item1.title}" style="width: 100%; border-radius: 5px; object-fit: cover;">` : '')}
+                            ` : (item1.thumbnail ? `<img src="${item1.thumbnail}" alt="${item1.title}" style="width: 90%; border-radius: 5px; object-fit: cover;">` : '')}
                             ${item1.urlDisplay ? `<a href="${item1.platformLink}" target="_blank" style="color: #a855f7; font-size: 0.8em; text-decoration: none; font-weight: 500; word-break: break-all;">${item1.platformLink}</a>` : ''}
                         ` : '<div style="color: #64748b;">No ranking</div>'}
                     </div>
@@ -1703,13 +1703,13 @@ class RankingManager {
                                 <div style="color: #f1f5f9; font-weight: 600; font-size: 0.95em;">${item2.title}</div>
                             </div>
                             ${item2.isYouTube ? `
-                                <div style="width: 100%; position: relative; aspect-ratio: 16/9; background: #0f172a; border-radius: 5px; overflow: hidden;">
+                                <div style="width: 90%; position: relative; aspect-ratio: 16/9; background: #0f172a; border-radius: 5px; overflow: hidden;">
                                     <img src="https://img.youtube.com/vi/${item2.videoId}/maxresdefault.jpg" alt="thumbnail" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="this.parentElement.innerHTML = '<iframe width=\\'100%\\' height=\\'100%\\' src=\\'https://www.youtube.com/embed/${item2.videoId}?autoplay=1\\' frameborder=\\'0\\' allow=\\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\\' allowfullscreen style=\\'position: absolute; top: 0; left: 0;\\' loading=\\'lazy\\'></iframe>';" style="display: block;">
-                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none;">
-                                        <div style="width: 0; height: 0; border-left: 16px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 3px;"></div>
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 45px; height: 45px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none;">
+                                        <div style="width: 0; height: 0; border-left: 14px solid white; border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 2px;"></div>
                                     </div>
                                 </div>
-                            ` : (item2.thumbnail ? `<img src="${item2.thumbnail}" alt="${item2.title}" style="width: 100%; border-radius: 5px; object-fit: cover;">` : '')}
+                            ` : (item2.thumbnail ? `<img src="${item2.thumbnail}" alt="${item2.title}" style="width: 90%; border-radius: 5px; object-fit: cover;">` : '')}
                             ${item2.urlDisplay ? `<a href="${item2.platformLink}" target="_blank" style="color: #06b6d4; font-size: 0.8em; text-decoration: none; font-weight: 500; word-break: break-all;">${item2.platformLink}</a>` : ''}
                         ` : '<div style="color: #64748b;">No ranking</div>'}
                     </div>
