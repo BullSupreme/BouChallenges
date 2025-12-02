@@ -1425,14 +1425,19 @@ class RankingManager {
             const title = item.querySelector('.song-title')?.textContent || '';
             const artist = item.querySelector('.song-artist')?.textContent || 'N/A';
             const thumbnail = item.querySelector('.song-thumbnail')?.src || '';
+            const platformLink = item.querySelector('.song-platform a')?.href || item.querySelector('.song-platform')?.textContent || '';
+
+            // Extract just the URL text for display
+            const urlDisplay = platformLink.startsWith('http') ? platformLink : '';
 
             itemsHTML += `
-                <div style="display: grid; grid-template-columns: 60px 100px 1fr; gap: 15px; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155;">
+                <div style="display: grid; grid-template-columns: 60px 100px 1fr; gap: 15px; align-items: start; padding: 10px 0; border-bottom: 1px solid #334155;">
                     <div style="font-size: 1.3em; font-weight: 700; color: #a855f7; text-align: center;">${rank}</div>
-                    ${thumbnail ? `<img src="${thumbnail}" alt="${title}" style="width: 100%; aspect-ratio: 1; border-radius: 5px; object-fit: cover;">` : '<div></div>'}
+                    ${thumbnail ? `<img src="${thumbnail}" alt="${title}" style="width: 100%; aspect-ratio: 1; border-radius: 5px; object-fit: cover; cursor: pointer;" onclick="window.open('${platformLink}', '_blank');">` : '<div></div>'}
                     <div>
-                        <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 4px;">${title}</div>
-                        <div style="color: #cbd5e1; font-size: 0.9em;">${artist}</div>
+                        <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 3px;">${title}</div>
+                        <div style="color: #cbd5e1; font-size: 0.9em; margin-bottom: 4px;">${artist}</div>
+                        ${urlDisplay ? `<a href="${platformLink}" target="_blank" style="color: #a855f7; font-size: 0.85em; text-decoration: none; font-weight: 500; word-break: break-all;">${platformLink}</a>` : ''}
                     </div>
                 </div>
             `;
