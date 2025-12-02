@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Anime OST/Theme - Bou Challenges</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+            color: #f1f5f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .songs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .song-item {
+            display: grid;
+            grid-template-columns: 60px 120px 1fr;
+            gap: 20px;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .song-item:hover {
+            background: linear-gradient(135deg, #2d3f4f 0%, #3a4a5a 100%);
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
+        }
+        .song-item-spotify {
+            grid-template-columns: 60px 1fr;
+        }
+        .spotify-embed-wrapper {
+            width: 100%;
+        }
+        .song-rank {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        .rank-gold .song-rank {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-silver .song-rank {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-bronze .song-rank {
+            background: linear-gradient(135deg, #cd7f32 0%, #e5a76f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .song-thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 5px;
+            object-fit: cover;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .song-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .song-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .song-artist {
+            font-size: 0.9em;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+        .song-platform {
+            font-size: 0.85em;
+            color: #a855f7;
+            font-weight: 500;
+        }
+        .song-platform a {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .song-platform a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #cbd5e1;
+            border-top: 2px solid #334155;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Top Anime OST/Theme</h1>
+        <div class="songs-list">
+            
+            <div class="song-item rank-gold" onclick="window.open('https://www.youtube.com/watch?v=f9NJHJH4fIU', '_blank');">
+                <div class="song-rank">#1</div>
+                <img src="https://img.youtube.com/vi/f9NJHJH4fIU/hqdefault.jpg" alt="To Love's End – Inuyasha 犬夜叉 – Epic Emotional Version" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">To Love's End – Inuyasha 犬夜叉 –&nbsp;Epic Emotional Version</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=f9NJHJH4fIU" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=f9NJHJH4fIU</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-silver" onclick="window.open('https://www.youtube.com/watch?v=POLjhgMkTw8', '_blank');">
+                <div class="song-rank">#2</div>
+                <img src="https://img.youtube.com/vi/POLjhgMkTw8/hqdefault.jpg" alt="Fields of hope" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Fields of hope</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=POLjhgMkTw8" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=POLjhgMkTw8</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-bronze" onclick="window.open('https://www.youtube.com/watch?v=sCDwSCYEWoY', '_blank');">
+                <div class="song-rank">#3</div>
+                <img src="https://img.youtube.com/vi/sCDwSCYEWoY/hqdefault.jpg" alt="TVアニメ『ガールズバンドクライ』第3話挿入歌「声なき魚」" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">TVアニメ『ガールズバンドクライ』第3話挿入歌「声なき魚」</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=sCDwSCYEWoY" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=sCDwSCYEWoY</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=3imnsCasPg4', '_blank');">
+                <div class="song-rank">#4</div>
+                <img src="https://img.youtube.com/vi/3imnsCasPg4/hqdefault.jpg" alt="Gravitation Bad Luck Blind Game again" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Gravitation Bad Luck Blind Game again</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=3imnsCasPg4" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=3imnsCasPg4</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=xxfUT6kLi9g', '_blank');">
+                <div class="song-rank">#5</div>
+                <img src="https://img.youtube.com/vi/xxfUT6kLi9g/hqdefault.jpg" alt="Shine Days" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Shine Days</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=xxfUT6kLi9g" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=xxfUT6kLi9g</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=SVEgWROZYKc', '_blank');">
+                <div class="song-rank">#6</div>
+                <img src="https://img.youtube.com/vi/SVEgWROZYKc/hqdefault.jpg" alt="God Knows - Haruhi Suzumiya (CV. Aya Hirano) [Romaji, Español, English, Lyrics]" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">God Knows - Haruhi Suzumiya (CV. Aya Hirano) [Romaji, Español, English, Lyrics]</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=SVEgWROZYKc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=SVEgWROZYKc</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=iDvxIWhQjsU', '_blank');">
+                <div class="song-rank">#7</div>
+                <img src="https://img.youtube.com/vi/iDvxIWhQjsU/hqdefault.jpg" alt="Sleepless Beauty {Gravitation}" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Sleepless Beauty {Gravitation}</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=iDvxIWhQjsU" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=iDvxIWhQjsU</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=FwKqLkmlU4k', '_blank');">
+                <div class="song-rank">#8</div>
+                <img src="https://img.youtube.com/vi/FwKqLkmlU4k/hqdefault.jpg" alt="【Full HD/テロップ歌詞】 一番の宝物 ~Yui final ver.~／Girls Dead Monster STARRING LiSA" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">【Full HD/テロップ歌詞】 一番の宝物 ~Yui final ver.~／Girls Dead Monster STARRING LiSA</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=FwKqLkmlU4k" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=FwKqLkmlU4k</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=pA-pzhQQFBA', '_blank');">
+                <div class="song-rank">#9</div>
+                <img src="https://img.youtube.com/vi/pA-pzhQQFBA/hqdefault.jpg" alt="TVアニメ『ガールズバンドクライ』第1話挿入歌「空の箱」" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">TVアニメ『ガールズバンドクライ』第1話挿入歌「空の箱」</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=pA-pzhQQFBA" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=pA-pzhQQFBA</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=dXhhs5R_l54&list=PLDDE3E644BB3B8464&index=34', '_blank');">
+                <div class="song-rank">#10</div>
+                <img src="https://img.youtube.com/vi/dXhhs5R_l54/hqdefault.jpg" alt="Air Gear OST II - 01 - Rockin' 8 Glider mix" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Air Gear OST II - 01 - Rockin' 8 Glider mix</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=dXhhs5R_l54&list=PLDDE3E644BB3B8464&index=34" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=dXhhs5R_l54&list=PLDDE3E644BB3B8464&index=34</a></div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p>Created by a Bou for a Bou | Made with ❤️</p>
+        </footer>
+    </div>
+</body>
+</html>

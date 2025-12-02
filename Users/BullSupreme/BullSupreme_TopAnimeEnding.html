@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Anime Ending - Bou Challenges</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+            color: #f1f5f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .songs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .song-item {
+            display: grid;
+            grid-template-columns: 60px 120px 1fr;
+            gap: 20px;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .song-item:hover {
+            background: linear-gradient(135deg, #2d3f4f 0%, #3a4a5a 100%);
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
+        }
+        .song-item-spotify {
+            grid-template-columns: 60px 1fr;
+        }
+        .spotify-embed-wrapper {
+            width: 100%;
+        }
+        .song-rank {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        .rank-gold .song-rank {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-silver .song-rank {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-bronze .song-rank {
+            background: linear-gradient(135deg, #cd7f32 0%, #e5a76f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .song-thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 5px;
+            object-fit: cover;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .song-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .song-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .song-artist {
+            font-size: 0.9em;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+        .song-platform {
+            font-size: 0.85em;
+            color: #a855f7;
+            font-weight: 500;
+        }
+        .song-platform a {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .song-platform a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #cbd5e1;
+            border-top: 2px solid #334155;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Top Anime Ending</h1>
+        <div class="songs-list">
+            
+            <div class="song-item rank-gold" onclick="window.open('https://www.youtube.com/watch?v=sA86032kEt8', '_blank');">
+                <div class="song-rank">#1</div>
+                <img src="https://img.youtube.com/vi/sA86032kEt8/hqdefault.jpg" alt="InuYasha - Fukai mori" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">InuYasha - Fukai mori</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=sA86032kEt8" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=sA86032kEt8</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-silver" onclick="window.open('https://www.youtube.com/watch?v=gIA-LGG2c0U', '_blank');">
+                <div class="song-rank">#2</div>
+                <img src="https://img.youtube.com/vi/gIA-LGG2c0U/hqdefault.jpg" alt="GUNDAM SEED DESTINY " Reason "" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">GUNDAM SEED DESTINY " Reason "</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=gIA-LGG2c0U" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=gIA-LGG2c0U</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-bronze" onclick="window.open('https://www.youtube.com/watch?v=j9qsUMuhVXM', '_blank');">
+                <div class="song-rank">#3</div>
+                <img src="https://img.youtube.com/vi/j9qsUMuhVXM/hqdefault.jpg" alt="機動戦士ガンダムSEED Full Ending あんなに一緒だったのに ~ReTracks by See-Saw 中日歌詞" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">機動戦士ガンダムSEED Full Ending あんなに一緒だったのに ~ReTracks by See-Saw&nbsp;中日歌詞</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=j9qsUMuhVXM" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=j9qsUMuhVXM</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=Dlslf5qkvC0', '_blank');">
+                <div class="song-rank">#4</div>
+                <img src="https://img.youtube.com/vi/Dlslf5qkvC0/hqdefault.jpg" alt="犬夜叉 InuYasha - Ending 1 「My Will」 dream (Blu-Ray Version)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">犬夜叉 InuYasha - Ending 1 「My Will」 dream (Blu-Ray Version)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=Dlslf5qkvC0" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=Dlslf5qkvC0</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=q5cJJACIPNs', '_blank');">
+                <div class="song-rank">#5</div>
+                <img src="https://img.youtube.com/vi/q5cJJACIPNs/hqdefault.jpg" alt="InuYasha-  Ending 3 [Dearest] (Ayumi Hamasaki)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">InuYasha-  Ending 3 [Dearest] (Ayumi Hamasaki)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=q5cJJACIPNs" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=q5cJJACIPNs</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=4pyJT_zd_xs', '_blank');">
+                <div class="song-rank">#6</div>
+                <img src="https://img.youtube.com/vi/4pyJT_zd_xs/hqdefault.jpg" alt="(Shokugeki no Soma Ending 1)「Spice - Tokyo Karan Koron」[Romaji, Español, English, Lyrics]" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">(Shokugeki no Soma Ending 1)「Spice - Tokyo Karan Koron」[Romaji, Español, English, Lyrics]</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=4pyJT_zd_xs" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=4pyJT_zd_xs</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=1zeED2iW-G4', '_blank');">
+                <div class="song-rank">#7</div>
+                <img src="https://img.youtube.com/vi/1zeED2iW-G4/hqdefault.jpg" alt="Bleach Ending 3 - All Squads" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Bleach Ending 3 - All Squads</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=1zeED2iW-G4" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=1zeED2iW-G4</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=bJhUQxo6V-A', '_blank');">
+                <div class="song-rank">#8</div>
+                <img src="https://img.youtube.com/vi/bJhUQxo6V-A/hqdefault.jpg" alt="Life Goes On" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Life Goes On</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=bJhUQxo6V-A" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=bJhUQxo6V-A</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=evMiIiKYROk', '_blank');">
+                <div class="song-rank">#9</div>
+                <img src="https://img.youtube.com/vi/evMiIiKYROk/hqdefault.jpg" alt="InuYasha~Ending 5 Shinjitsu no Uta Song of Truth Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">InuYasha~Ending 5 Shinjitsu no Uta Song of Truth Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=evMiIiKYROk" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=evMiIiKYROk</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=D3IDK_R1LTg', '_blank');">
+                <div class="song-rank">#10</div>
+                <img src="https://img.youtube.com/vi/D3IDK_R1LTg/hqdefault.jpg" alt="Every Heart-ミンナノキモチ- / BoA" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Every Heart-ミンナノキモチ- / BoA</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=D3IDK_R1LTg" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=D3IDK_R1LTg</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=fKTZ2cVEsBI', '_blank');">
+                <div class="song-rank">#11</div>
+                <img src="https://img.youtube.com/vi/fKTZ2cVEsBI/hqdefault.jpg" alt="Gundam Seed Destiny - Find the way" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Gundam Seed Destiny - Find the way</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=fKTZ2cVEsBI" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=fKTZ2cVEsBI</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=QA772MHy794', '_blank');">
+                <div class="song-rank">#12</div>
+                <img src="https://img.youtube.com/vi/QA772MHy794/hqdefault.jpg" alt="Sayuri - Sore wa Shiisana Hikari no Youna / Boku Dake Ga Inai Machi (ERASED) FULL ENDING" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Sayuri - Sore wa Shiisana Hikari no Youna / Boku Dake Ga Inai Machi (ERASED) FULL ENDING</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=QA772MHy794" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=QA772MHy794</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=X46nnCxs6wk', '_blank');">
+                <div class="song-rank">#13</div>
+                <img src="https://img.youtube.com/vi/X46nnCxs6wk/hqdefault.jpg" alt="Mobile Suit Gundam: The Witch from Mercury - Ending 2 | Red:birthmark" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Mobile Suit Gundam: The Witch from Mercury - Ending 2 | Red:birthmark</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=X46nnCxs6wk" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=X46nnCxs6wk</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=eqjFmsZGBSc', '_blank');">
+                <div class="song-rank">#14</div>
+                <img src="https://img.youtube.com/vi/eqjFmsZGBSc/hqdefault.jpg" alt="Kaguya-sama: Love is War Ending 2 (4k 60FPS)┃Creditless" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Kaguya-sama: Love is War Ending 2 (4k 60FPS)┃Creditless</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=eqjFmsZGBSc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=eqjFmsZGBSc</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=5OABzwCOeLw', '_blank');">
+                <div class="song-rank">#15</div>
+                <img src="https://img.youtube.com/vi/5OABzwCOeLw/hqdefault.jpg" alt="Black Clover Ending 3 Full『Black to the dreamlight』by EMPiRE | Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Black Clover Ending 3 Full『Black to the dreamlight』by EMPiRE | Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=5OABzwCOeLw" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=5OABzwCOeLw</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=Tim5mhhJr5Y', '_blank');">
+                <div class="song-rank">#16</div>
+                <img src="https://img.youtube.com/vi/Tim5mhhJr5Y/hqdefault.jpg" alt="InuYasha - Ending 7 (Full)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">InuYasha - Ending 7 (Full)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=Tim5mhhJr5Y" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=Tim5mhhJr5Y</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=jLTvWa_7M3M', '_blank');">
+                <div class="song-rank">#17</div>
+                <img src="https://img.youtube.com/vi/jLTvWa_7M3M/hqdefault.jpg" alt="[Psycho-Pass] | Ending 1 FULL (HQ)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">[Psycho-Pass] | Ending 1 FULL (HQ)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=jLTvWa_7M3M" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=jLTvWa_7M3M</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=CC5QLCSqfZ4', '_blank');">
+                <div class="song-rank">#18</div>
+                <img src="https://img.youtube.com/vi/CC5QLCSqfZ4/hqdefault.jpg" alt="Mobile Suit Gundam Seed Destiny Ending 3 - I Wanna Go To A Place" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Mobile Suit Gundam Seed Destiny Ending 3 - I Wanna Go To A Place</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=CC5QLCSqfZ4" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=CC5QLCSqfZ4</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=wtW529XbOyU', '_blank');">
+                <div class="song-rank">#19</div>
+                <img src="https://img.youtube.com/vi/wtW529XbOyU/hqdefault.jpg" alt="Sawano Hiroyuki - aLIEz Aldnoah.Zero Full Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Sawano Hiroyuki - aLIEz Aldnoah.Zero Full Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=wtW529XbOyU" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=wtW529XbOyU</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=QUTShho-5I8', '_blank');">
+                <div class="song-rank">#20</div>
+                <img src="https://img.youtube.com/vi/QUTShho-5I8/hqdefault.jpg" alt="Oshi No Ko - Ending 1 (Mephisto) | 4K UHD Creditless | Subtitles" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Oshi No Ko - Ending 1 (Mephisto) | 4K UHD Creditless | Subtitles</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=QUTShho-5I8" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=QUTShho-5I8</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=0x9EoG1HpjQ', '_blank');">
+                <div class="song-rank">#21</div>
+                <img src="https://img.youtube.com/vi/0x9EoG1HpjQ/hqdefault.jpg" alt="It's Just Love!" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">It's Just Love!</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=0x9EoG1HpjQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=0x9EoG1HpjQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=4DcR_BgyQ7k', '_blank');">
+                <div class="song-rank">#22</div>
+                <img src="https://img.youtube.com/vi/4DcR_BgyQ7k/hqdefault.jpg" alt="Sword Art Online Ending 2" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Sword Art Online Ending 2</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=4DcR_BgyQ7k" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=4DcR_BgyQ7k</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=ojPKvzQdo7k', '_blank');">
+                <div class="song-rank">#23</div>
+                <img src="https://img.youtube.com/vi/ojPKvzQdo7k/hqdefault.jpg" alt="Free! Iwatobi Swim Club Ending | SPLASH FREE" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Free! Iwatobi Swim Club Ending | SPLASH FREE</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=ojPKvzQdo7k" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=ojPKvzQdo7k</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=U6BkF23UPbM', '_blank');">
+                <div class="song-rank">#24</div>
+                <img src="https://img.youtube.com/vi/U6BkF23UPbM/hqdefault.jpg" alt="Kimi wa Boku ni Niteiru" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Kimi wa Boku ni Niteiru</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=U6BkF23UPbM" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=U6BkF23UPbM</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=NZqm-Nv4wCg&list=PLgAXHvIPSrkpYCvxJli5BQhUvzeaD47X4&index=4', '_blank');">
+                <div class="song-rank">#25</div>
+                <img src="https://img.youtube.com/vi/NZqm-Nv4wCg/hqdefault.jpg" alt="FMP Full Metal Panic Fumoffu ED Kimi Ni Fuku Kaze + Lyrics + English Sub" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">FMP Full Metal Panic Fumoffu ED Kimi Ni Fuku Kaze + Lyrics + English Sub</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=NZqm-Nv4wCg&list=PLgAXHvIPSrkpYCvxJli5BQhUvzeaD47X4&index=4" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=NZqm-Nv4wCg&list=PLgAXHvIPSrkpYCvxJli5BQhUvzeaD47X4&index=4</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=05Sd-lRI4iI', '_blank');">
+                <div class="song-rank">#27</div>
+                <img src="https://img.youtube.com/vi/05Sd-lRI4iI/hqdefault.jpg" alt="V6 - brand new world (Inuyasha ED) - Color Coded Lyrics [Kan/Rom/Eng]" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">V6 - brand new world (Inuyasha ED) - Color Coded Lyrics [Kan/Rom/Eng]</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=05Sd-lRI4iI" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=05Sd-lRI4iI</a></div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p>Created by a Bou for a Bou | Made with ❤️</p>
+        </footer>
+    </div>
+</body>
+</html>
