@@ -11,6 +11,11 @@
         <header>
             <h1>🎉 Bou Challenges 🎉</h1>
             <p class="subtitle">Your Ranking Lists</p>
+            <div style="margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <input type="text" id="usernameInput" placeholder="Enter your username" style="padding: 8px 12px; border: 2px solid #334155; border-radius: 6px; background: #1e293b; color: #f1f5f9; font-size: 0.95em;">
+                <button onclick="setUsername()" style="padding: 8px 16px; background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Set Username</button>
+                <span id="usernameDisplay" style="color: #cbd5e1; font-size: 0.9em; margin-left: 10px;"></span>
+            </div>
         </header>
 
         <main>
@@ -40,8 +45,52 @@
         </main>
 
         <footer>
-            <p>Created by a Bou for a Bou | Made with ❤️</p>
+            <p>Created by a Bou for a Bou</p>
         </footer>
     </div>
+
+    <script>
+        function setUsername() {
+            const input = document.getElementById('usernameInput');
+            const username = input.value.trim();
+
+            if (!username) {
+                alert('Please enter a username');
+                return;
+            }
+
+            localStorage.setItem('bouUsername', username);
+            displayUsername();
+            input.value = '';
+        }
+
+        function displayUsername() {
+            const username = localStorage.getItem('bouUsername');
+            const display = document.getElementById('usernameDisplay');
+
+            if (username) {
+                display.textContent = `Current: ${username}`;
+            }
+        }
+
+        function getUsername() {
+            return localStorage.getItem('bouUsername') || '';
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', displayUsername);
+
+        // Allow Enter key to set username
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('usernameInput');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        setUsername();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

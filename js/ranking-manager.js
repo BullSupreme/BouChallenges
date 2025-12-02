@@ -28,6 +28,10 @@ class RankingManager {
         this.renderItems();
         // Setup duplicate detection
         this.setupDuplicateDetection();
+        // Setup community rankings browser (only on category pages, not home)
+        if (this.itemsList && this.itemsList.closest('.songs-list')) {
+            this.setupCommunityBrowser();
+        }
     }
 
     // Parse URL and extract metadata (YouTube/Spotify specific)
@@ -961,9 +965,11 @@ class RankingManager {
         const a = document.createElement('a');
         a.href = url;
 
-        // Generate dynamic filename from the category title
-        // e.g., "Top Disney Songs" -> "TopDisneySongs.html"
-        const filename = categoryTitle.replace(/\s+/g, '') + '.html';
+        // Generate dynamic filename from the category title and username
+        // e.g., "Top Disney Songs" with username "BullSupreme" -> "BullSupreme_TopDisneySongs.html"
+        const username = typeof getUsername === 'function' ? getUsername() : (localStorage.getItem('bouUsername') || '');
+        const baseFilename = categoryTitle.replace(/\s+/g, '');
+        const filename = username ? `${username}_${baseFilename}.html` : `${baseFilename}.html`;
         a.download = filename;
 
         document.body.appendChild(a);
@@ -1221,5 +1227,222 @@ class RankingManager {
                 }
             }
         }
+    }
+
+    // Community Rankings Methods
+    async fetchCommunityRankings() {
+        try {
+            // Fetch list of users from GitHub
+            const response = await fetch(
+                'https://api.github.com/repos/BullSupreme/BouChallenges/contents/Users',
+                { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+            );
+
+            if (!response.ok) return [];
+
+            const users = await response.json();
+            return users.filter(item => item.type === 'dir').map(item => item.name);
+        } catch (error) {
+            console.log('Could not fetch community rankings:', error);
+            return [];
+        }
+    }
+
+    async getCategoryFilesForUser(username, categoryName) {
+        try {
+            const response = await fetch(
+                `https://api.github.com/repos/BullSupreme/BouChallenges/contents/Users/${username}`,
+                { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+            );
+
+            if (!response.ok) return [];
+
+            const files = await response.json();
+            // Filter for files matching the category
+            return files.filter(item =>
+                item.type === 'file' &&
+                item.name.toLowerCase().includes(categoryName.toLowerCase().replace(/\s+/g, ''))
+            );
+        } catch (error) {
+            console.log('Could not fetch category files:', error);
+            return [];
+        }
+    }
+
+    async fetchUserRankingHTML(username, filename) {
+        try {
+            const response = await fetch(
+                `https://api.github.com/repos/BullSupreme/BouChallenges/contents/Users/${username}/${filename}`,
+                { headers: { 'Accept': 'application/vnd.github.v3.raw' } }
+            );
+
+            if (!response.ok) return null;
+
+            return await response.text();
+        } catch (error) {
+            console.log('Could not fetch user ranking:', error);
+            return null;
+        }
+    }
+
+    async setupCommunityBrowser() {
+        // Create community rankings section
+        const container = document.querySelector('.songs-list') || document.getElementById('songsList');
+        if (!container || document.getElementById('communitySection')) return;
+
+        const communitySection = document.createElement('div');
+        communitySection.id = 'communitySection';
+        communitySection.style.cssText = `
+            margin-top: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            border-radius: 10px;
+            border: 2px solid #334155;
+        `;
+
+        communitySection.innerHTML = `
+            <h3 style="color: #f1f5f9; margin-bottom: 15px; font-size: 1.3em;">Community Rankings</h3>
+            <div id="communityUsers" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px;"></div>
+        `;
+
+        container.parentNode.insertBefore(communitySection, container.nextSibling);
+
+        // Fetch and display users
+        const users = await this.fetchCommunityRankings();
+        const communityUsers = document.getElementById('communityUsers');
+
+        if (users.length === 0) {
+            communityUsers.innerHTML = '<p style="color: #cbd5e1;">No community rankings yet</p>';
+            return;
+        }
+
+        for (const username of users) {
+            const userCard = document.createElement('div');
+            userCard.style.cssText = `
+                padding: 12px;
+                background: rgba(0,0,0,0.3);
+                border: 2px solid #334155;
+                border-radius: 8px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-align: center;
+            `;
+            userCard.innerHTML = `<div style="color: #a855f7; font-weight: 600;">${username}</div>`;
+
+            userCard.addEventListener('mouseover', function() {
+                this.style.background = 'rgba(168, 85, 247, 0.2)';
+                this.style.borderColor = '#a855f7';
+                this.style.transform = 'translateY(-2px)';
+            });
+
+            userCard.addEventListener('mouseout', function() {
+                this.style.background = 'rgba(0,0,0,0.3)';
+                this.style.borderColor = '#334155';
+                this.style.transform = 'translateY(0)';
+            });
+
+            userCard.addEventListener('click', () => this.viewUserRanking(username));
+            communityUsers.appendChild(userCard);
+        }
+    }
+
+    async viewUserRanking(username) {
+        // Get current category from page
+        const categoryTitle = document.querySelector('.songs-list h2')?.textContent?.trim() || 'Rankings';
+
+        // Fetch user's files for this category
+        const files = await this.getCategoryFilesForUser(username, categoryTitle);
+
+        if (files.length === 0) {
+            alert(`${username} has not submitted rankings for "${categoryTitle}"`);
+            return;
+        }
+
+        // Get the first matching file
+        const filename = files[0].name;
+        const htmlContent = await this.fetchUserRankingHTML(username, filename);
+
+        if (!htmlContent) {
+            alert('Could not load ranking');
+            return;
+        }
+
+        // Parse and display
+        this.displayUserRankingModal(username, htmlContent, categoryTitle);
+    }
+
+    displayUserRankingModal(username, htmlContent, categoryTitle) {
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        `;
+
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            border: 2px solid #334155;
+            border-radius: 10px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            color: #f1f5f9;
+        `;
+
+        // Parse HTML to extract ranking data
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        const items = doc.querySelectorAll('.song-item');
+
+        let itemsHTML = '';
+        items.forEach((item) => {
+            const rank = item.querySelector('.song-rank')?.textContent || '#?';
+            const title = item.querySelector('.song-title')?.textContent || '';
+            const artist = item.querySelector('.song-artist')?.textContent || 'N/A';
+            const thumbnail = item.querySelector('.song-thumbnail')?.src || '';
+
+            itemsHTML += `
+                <div style="display: grid; grid-template-columns: 60px 100px 1fr; gap: 15px; align-items: center; padding: 10px 0; border-bottom: 1px solid #334155;">
+                    <div style="font-size: 1.3em; font-weight: 700; color: #a855f7; text-align: center;">${rank}</div>
+                    ${thumbnail ? `<img src="${thumbnail}" alt="${title}" style="width: 100%; aspect-ratio: 1; border-radius: 5px; object-fit: cover;">` : '<div></div>'}
+                    <div>
+                        <div style="color: #f1f5f9; font-weight: 600; margin-bottom: 4px;">${title}</div>
+                        <div style="color: #cbd5e1; font-size: 0.9em;">${artist}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        content.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: #a855f7; margin: 0;">${username}'s ${categoryTitle}</h2>
+                <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background: #334155; color: #f1f5f9; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">Close</button>
+            </div>
+            <div style="max-height: calc(80vh - 100px); overflow-y: auto;">
+                ${itemsHTML || '<p style="color: #cbd5e1;">No rankings found</p>'}
+            </div>
+        `;
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        // Close on background click
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
     }
 }
