@@ -1348,6 +1348,9 @@ class RankingManager {
             return;
         }
 
+        // Track selected users for comparison
+        const selectedUsers = new Set();
+
         for (const username of usersWithCategory) {
             const userCard = document.createElement('div');
             userCard.style.cssText = `
@@ -1357,25 +1360,109 @@ class RankingManager {
                 border-radius: 8px;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                text-align: center;
+                display: flex;
+                align-items: center;
+                gap: 10px;
             `;
-            userCard.innerHTML = `<div style="color: #a855f7; font-weight: 600;">${username}</div>`;
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.style.cssText = `
+                cursor: pointer;
+                width: 18px;
+                height: 18px;
+                flex-shrink: 0;
+            `;
+
+            const label = document.createElement('div');
+            label.style.cssText = `
+                color: #a855f7;
+                font-weight: 600;
+                flex: 1;
+            `;
+            label.textContent = username;
+
+            userCard.appendChild(checkbox);
+            userCard.appendChild(label);
 
             userCard.addEventListener('mouseover', function() {
                 this.style.background = 'rgba(168, 85, 247, 0.2)';
                 this.style.borderColor = '#a855f7';
-                this.style.transform = 'translateY(-2px)';
             });
 
             userCard.addEventListener('mouseout', function() {
-                this.style.background = 'rgba(0,0,0,0.3)';
-                this.style.borderColor = '#334155';
-                this.style.transform = 'translateY(0)';
+                if (!checkbox.checked) {
+                    this.style.background = 'rgba(0,0,0,0.3)';
+                    this.style.borderColor = '#334155';
+                }
             });
 
-            userCard.addEventListener('click', () => this.viewUserRanking(username));
+            checkbox.addEventListener('change', () => {
+                if (checkbox.checked) {
+                    selectedUsers.add(username);
+                    userCard.style.background = 'rgba(168, 85, 247, 0.3)';
+                    userCard.style.borderColor = '#a855f7';
+                } else {
+                    selectedUsers.delete(username);
+                    userCard.style.background = 'rgba(0,0,0,0.3)';
+                    userCard.style.borderColor = '#334155';
+                }
+
+                // Enable/disable compare button
+                if (selectedUsers.size >= 2) {
+                    compareBtn.style.opacity = '1';
+                    compareBtn.style.pointerEvents = 'auto';
+                } else {
+                    compareBtn.style.opacity = '0.5';
+                    compareBtn.style.pointerEvents = 'none';
+                }
+            });
+
+            // Single click to view ranking
+            label.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.viewUserRanking(username);
+            });
+
             communityUsers.appendChild(userCard);
         }
+
+        // Add compare button
+        const compareBtn = document.createElement('button');
+        compareBtn.style.cssText = `
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            opacity: 0.5;
+            pointer-events: none;
+            transition: all 0.2s ease;
+        `;
+        compareBtn.textContent = 'Compare Selected';
+
+        compareBtn.addEventListener('mouseover', function() {
+            if (selectedUsers.size >= 2) {
+                this.style.background = 'linear-gradient(135deg, #0891b2 0%, #2563eb 100%)';
+            }
+        });
+
+        compareBtn.addEventListener('mouseout', function() {
+            this.style.background = 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)';
+        });
+
+        compareBtn.addEventListener('click', async () => {
+            if (selectedUsers.size >= 2) {
+                const usernames = Array.from(selectedUsers).slice(0, 2);
+                await this.displayComparisonModal(usernames[0], usernames[1], categoryTitle);
+            }
+        });
+
+        communityUsers.appendChild(compareBtn);
     }
 
     async viewUserRanking(username) {
@@ -1495,6 +1582,154 @@ class RankingManager {
             </div>
             <div style="flex: 1; overflow-y: auto; min-height: 0;">
                 ${itemsHTML || '<p style="color: #cbd5e1;">No rankings found</p>'}
+            </div>
+        `;
+
+        modal.appendChild(content);
+        document.body.appendChild(modal);
+
+        // Close on background click
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+    }
+
+    async displayComparisonModal(username1, username2, categoryTitle) {
+        // Get files for both users
+        const files1 = await this.getCategoryFilesForUser(username1, categoryTitle);
+        const files2 = await this.getCategoryFilesForUser(username2, categoryTitle);
+
+        if (files1.length === 0 || files2.length === 0) {
+            alert('Could not find rankings for comparison');
+            return;
+        }
+
+        const htmlContent1 = await this.fetchUserRankingHTML(username1, files1[0].name);
+        const htmlContent2 = await this.fetchUserRankingHTML(username2, files2[0].name);
+
+        if (!htmlContent1 || !htmlContent2) {
+            alert('Could not load rankings');
+            return;
+        }
+
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
+        `;
+
+        const content = document.createElement('div');
+        content.style.cssText = `
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            border: 2px solid #334155;
+            border-radius: 10px;
+            width: 100%;
+            max-height: 85vh;
+            padding: 20px;
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+        `;
+
+        // Helper function to parse items from HTML
+        const parseItems = (htmlContent) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const items = [];
+            doc.querySelectorAll('.song-item').forEach((item) => {
+                const rank = item.querySelector('.song-rank')?.textContent || '#?';
+                const title = item.querySelector('.song-title')?.textContent || '';
+                const thumbnail = item.querySelector('.song-thumbnail')?.src || '';
+                const platformLink = item.querySelector('.song-platform a')?.href || item.querySelector('.song-platform')?.textContent || '';
+                const urlDisplay = platformLink.startsWith('http') ? platformLink : '';
+                const videoId = this.extractYouTubeVideoId(platformLink);
+                const isYouTube = videoId !== null;
+
+                items.push({ rank, title, thumbnail, platformLink, urlDisplay, videoId, isYouTube });
+            });
+            return items;
+        };
+
+        const items1 = parseItems(htmlContent1);
+        const items2 = parseItems(htmlContent2);
+
+        // Build comparison HTML
+        const maxItems = Math.max(items1.length, items2.length);
+        let comparisonHTML = '';
+
+        for (let i = 0; i < maxItems; i++) {
+            const item1 = items1[i];
+            const item2 = items2[i];
+
+            comparisonHTML += `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 15px 0; border-bottom: 1px solid #334155;">
+                    <!-- User 1 Item -->
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        ${item1 ? `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1.3em; font-weight: 700; color: #a855f7; min-width: 35px; text-align: center;">${item1.rank}</div>
+                                <div style="color: #f1f5f9; font-weight: 600; font-size: 0.95em;">${item1.title}</div>
+                            </div>
+                            ${item1.isYouTube ? `
+                                <div style="width: 100%; position: relative; aspect-ratio: 16/9; background: #0f172a; border-radius: 5px; overflow: hidden;">
+                                    <img src="https://img.youtube.com/vi/${item1.videoId}/maxresdefault.jpg" alt="thumbnail" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="this.parentElement.innerHTML = '<iframe width=\\'100%\\' height=\\'100%\\' src=\\'https://www.youtube.com/embed/${item1.videoId}?autoplay=1\\' frameborder=\\'0\\' allow=\\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\\' allowfullscreen style=\\'position: absolute; top: 0; left: 0;\\' loading=\\'lazy\\'></iframe>';" style="display: block;">
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none;">
+                                        <div style="width: 0; height: 0; border-left: 16px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 3px;"></div>
+                                    </div>
+                                </div>
+                            ` : (item1.thumbnail ? `<img src="${item1.thumbnail}" alt="${item1.title}" style="width: 100%; border-radius: 5px; object-fit: cover;">` : '')}
+                            ${item1.urlDisplay ? `<a href="${item1.platformLink}" target="_blank" style="color: #a855f7; font-size: 0.8em; text-decoration: none; font-weight: 500; word-break: break-all;">${item1.platformLink}</a>` : ''}
+                        ` : '<div style="color: #64748b;">No ranking</div>'}
+                    </div>
+
+                    <!-- User 2 Item -->
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        ${item2 ? `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="font-size: 1.3em; font-weight: 700; color: #06b6d4; min-width: 35px; text-align: center;">${item2.rank}</div>
+                                <div style="color: #f1f5f9; font-weight: 600; font-size: 0.95em;">${item2.title}</div>
+                            </div>
+                            ${item2.isYouTube ? `
+                                <div style="width: 100%; position: relative; aspect-ratio: 16/9; background: #0f172a; border-radius: 5px; overflow: hidden;">
+                                    <img src="https://img.youtube.com/vi/${item2.videoId}/maxresdefault.jpg" alt="thumbnail" style="width: 100%; height: 100%; object-fit: cover; cursor: pointer;" onclick="this.parentElement.innerHTML = '<iframe width=\\'100%\\' height=\\'100%\\' src=\\'https://www.youtube.com/embed/${item2.videoId}?autoplay=1\\' frameborder=\\'0\\' allow=\\'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\\' allowfullscreen style=\\'position: absolute; top: 0; left: 0;\\' loading=\\'lazy\\'></iframe>';" style="display: block;">
+                                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50px; height: 50px; background: rgba(255, 0, 0, 0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: none;">
+                                        <div style="width: 0; height: 0; border-left: 16px solid white; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 3px;"></div>
+                                    </div>
+                                </div>
+                            ` : (item2.thumbnail ? `<img src="${item2.thumbnail}" alt="${item2.title}" style="width: 100%; border-radius: 5px; object-fit: cover;">` : '')}
+                            ${item2.urlDisplay ? `<a href="${item2.platformLink}" target="_blank" style="color: #06b6d4; font-size: 0.8em; text-decoration: none; font-weight: 500; word-break: break-all;">${item2.platformLink}</a>` : ''}
+                        ` : '<div style="color: #64748b;">No ranking</div>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        content.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
+                <div style="display: flex; gap: 20px; align-items: center; flex: 1;">
+                    <h2 style="color: #a855f7; margin: 0; text-align: center; flex: 1; border-right: 2px solid #334155; padding-right: 20px;">${username1}</h2>
+                    <h2 style="color: #06b6d4; margin: 0; text-align: center; flex: 1;">${username2}</h2>
+                </div>
+                <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background: #334155; color: #f1f5f9; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; flex-shrink: 0;">Close</button>
+            </div>
+            <div style="flex: 1; overflow-y: auto; min-height: 0;">
+                <div style="color: #cbd5e1; font-size: 0.9em; margin-bottom: 15px; padding: 0 10px;">
+                    <span style="color: #a855f7;">◆</span> ${categoryTitle}
+                </div>
+                ${comparisonHTML || '<p style="color: #cbd5e1;">No rankings to compare</p>'}
             </div>
         `;
 
