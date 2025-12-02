@@ -1444,9 +1444,10 @@ class RankingManager {
             max-width: 900px;
             width: 100%;
             max-height: 80vh;
-            overflow-y: auto;
             padding: 20px;
             color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
         `;
 
         // Parse HTML to extract ranking data
@@ -1490,11 +1491,11 @@ class RankingManager {
         });
 
         content.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
                 <h2 style="color: #a855f7; margin: 0;">${username}'s ${categoryTitle}</h2>
                 <button onclick="this.closest('div').parentElement.parentElement.remove()" style="background: #334155; color: #f1f5f9; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;">Close</button>
             </div>
-            <div style="max-height: calc(80vh - 100px); overflow-y: auto;">
+            <div style="flex: 1; overflow-y: auto; min-height: 0;">
                 ${itemsHTML || '<p style="color: #cbd5e1;">No rankings found</p>'}
             </div>
         `;
