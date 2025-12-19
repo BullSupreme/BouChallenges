@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Anime Opening - Bou Challenges</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+            color: #f1f5f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .songs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .song-item {
+            display: grid;
+            grid-template-columns: 60px 120px 1fr;
+            gap: 20px;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .song-item:hover {
+            background: linear-gradient(135deg, #2d3f4f 0%, #3a4a5a 100%);
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
+        }
+        .song-item-spotify {
+            grid-template-columns: 60px 1fr;
+        }
+        .spotify-embed-wrapper {
+            width: 100%;
+        }
+        .song-rank {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        .rank-gold .song-rank {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-silver .song-rank {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-bronze .song-rank {
+            background: linear-gradient(135deg, #cd7f32 0%, #e5a76f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .song-thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 5px;
+            object-fit: cover;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .song-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .song-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .song-artist {
+            font-size: 0.9em;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+        .song-platform {
+            font-size: 0.85em;
+            color: #a855f7;
+            font-weight: 500;
+        }
+        .song-platform a {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .song-platform a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #cbd5e1;
+            border-top: 2px solid #334155;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Top Anime Opening</h1>
+        <div class="songs-list">
+            
+            <div class="song-item rank-gold" onclick="window.open('https://www.youtube.com/watch?v=JuYeHPFR3f0', '_blank');">
+                <div class="song-rank">#1</div>
+                <img src="https://img.youtube.com/vi/JuYeHPFR3f0/hqdefault.jpg" alt="Pokémon Theme Song" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Pokémon Theme Song</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=JuYeHPFR3f0" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=JuYeHPFR3f0</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-silver" onclick="window.open('https://www.youtube.com/watch?v=NEBGjCC97CU', '_blank');">
+                <div class="song-rank">#2</div>
+                <img src="https://img.youtube.com/vi/NEBGjCC97CU/hqdefault.jpg" alt="「Just Communication」 Anime MV 【Gundam Wing】 Opening Theme (Subtitles)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">「Just Communication」 Anime MV 【Gundam Wing】 Opening Theme (Subtitles)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=NEBGjCC97CU" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=NEBGjCC97CU</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-bronze" onclick="window.open('https://www.youtube.com/watch?v=o6wtDPVkKqI', '_blank');">
+                <div class="song-rank">#3</div>
+                <img src="https://img.youtube.com/vi/o6wtDPVkKqI/hqdefault.jpg" alt="「残酷な天使のテーゼ」MUSIC VIDEO（HDver.）/Zankoku na Tenshi no Te-ze“The Cruel Angel's Thesis”" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">「残酷な天使のテーゼ」MUSIC VIDEO（HDver.）/Zankoku na Tenshi no Te-ze“The Cruel Angel's Thesis”</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=o6wtDPVkKqI" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=o6wtDPVkKqI</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=4ZYozk9gm0w', '_blank');">
+                <div class="song-rank">#4</div>
+                <img src="https://img.youtube.com/vi/4ZYozk9gm0w/hqdefault.jpg" alt="Air Gear Opening 1 [Full]" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Air Gear Opening 1 [Full]</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=4ZYozk9gm0w" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=4ZYozk9gm0w</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=tzat7-yAPyk', '_blank');">
+                <div class="song-rank">#5</div>
+                <img src="https://img.youtube.com/vi/tzat7-yAPyk/hqdefault.jpg" alt="伊東歌詞太郎「サイレントマイノリティー」MV（TVアニメ「乙女ゲー世界はモブに厳しい世界です」OP）" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">伊東歌詞太郎「サイレントマイノリティー」MV（TVアニメ「乙女ゲー世界はモブに厳しい世界です」OP）</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=tzat7-yAPyk" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=tzat7-yAPyk</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=YDLafQ-Rg-k', '_blank');">
+                <div class="song-rank">#6</div>
+                <img src="https://img.youtube.com/vi/YDLafQ-Rg-k/hqdefault.jpg" alt="TVアニメ『ガールズバンドクライ』ノンクレジットオープニング｜トゲナシトゲアリ「雑踏、僕らの街」" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">TVアニメ『ガールズバンドクライ』ノンクレジットオープニング｜トゲナシトゲアリ「雑踏、僕らの街」</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=YDLafQ-Rg-k" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=YDLafQ-Rg-k</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=klkxSuYK6Qo', '_blank');">
+                <div class="song-rank">#7</div>
+                <img src="https://img.youtube.com/vi/klkxSuYK6Qo/hqdefault.jpg" alt="「Creditless」Ranma ½ (2024) SEASON 2 OPENING -『Wo Ai Ni』by Wednesday Campanella | 4K 60FPS" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">「Creditless」Ranma ½ (2024) SEASON 2 OPENING -『Wo Ai Ni』by Wednesday Campanella | 4K 60FPS</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=klkxSuYK6Qo" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=klkxSuYK6Qo</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=xdNqoBZIUss', '_blank');">
+                <div class="song-rank">#8</div>
+                <img src="https://img.youtube.com/vi/xdNqoBZIUss/hqdefault.jpg" alt="Gravitation Super drive! Opening Full (nostalgic version)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Gravitation Super drive! Opening Full (nostalgic version)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=xdNqoBZIUss" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=xdNqoBZIUss</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=wL3XPLKE6I0', '_blank');">
+                <div class="song-rank">#9</div>
+                <img src="https://img.youtube.com/vi/wL3XPLKE6I0/hqdefault.jpg" alt="Full Metal Panic ! Tomorrow Op + Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Full Metal Panic ! Tomorrow Op + Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=wL3XPLKE6I0" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=wL3XPLKE6I0</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=1aPOj0ERTEc', '_blank');">
+                <div class="song-rank">#10</div>
+                <img src="https://img.youtube.com/vi/1aPOj0ERTEc/hqdefault.jpg" alt="LiSA『crossing field』 -MUSiC CLiP-（TVアニメ 「ソードアート・オンライン」 オープニングテーマ）" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">LiSA『crossing field』&nbsp;-MUSiC CLiP-（TVアニメ 「ソードアート・オンライン」 オープニングテーマ）</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=1aPOj0ERTEc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=1aPOj0ERTEc</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=DZV_-BjMSlc', '_blank');">
+                <div class="song-rank">#11</div>
+                <img src="https://img.youtube.com/vi/DZV_-BjMSlc/hqdefault.jpg" alt="Blood+ - Opening 1 (Full)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Blood+ - Opening 1 (Full)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=DZV_-BjMSlc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=DZV_-BjMSlc</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=NYbxYmdG1yc', '_blank');">
+                <div class="song-rank">#12</div>
+                <img src="https://img.youtube.com/vi/NYbxYmdG1yc/hqdefault.jpg" alt="「ignited」 Mobile Suit Gundam SEED DESTINY op1" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">「ignited」 Mobile Suit Gundam SEED DESTINY op1</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=NYbxYmdG1yc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=NYbxYmdG1yc</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=UTlAmJw9tI4&list=PLgAXHvIPSrkpYCvxJli5BQhUvzeaD47X4&index=3', '_blank');">
+                <div class="song-rank">#13</div>
+                <img src="https://img.youtube.com/vi/UTlAmJw9tI4/hqdefault.jpg" alt="FMP Full Metal Panic Fumoffu OP Sore Ga Ai Deshou + Lyrics + English Sub" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">FMP Full Metal Panic Fumoffu OP Sore Ga Ai Deshou + Lyrics + English Sub</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=UTlAmJw9tI4&list=PLgAXHvIPSrkpYCvxJli5BQhUvzeaD47X4&index=3" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=UTlAmJw9tI4&list=PLgAXHvIPSrkpYCvxJli5BQhUvzeaD47X4&index=3</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=pWZAa2NJ4f4', '_blank');">
+                <div class="song-rank">#14</div>
+                <img src="https://img.youtube.com/vi/pWZAa2NJ4f4/hqdefault.jpg" alt="Mobile Suit Gundam: SEED – Opening 1 Full 『 INVOKE 』Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Mobile Suit Gundam: SEED – Opening 1 Full 『 INVOKE 』Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=pWZAa2NJ4f4" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=pWZAa2NJ4f4</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=rzbjF2DRv1c', '_blank');">
+                <div class="song-rank">#15</div>
+                <img src="https://img.youtube.com/vi/rzbjF2DRv1c/hqdefault.jpg" alt="Solo Leveling Season 2 - Opening FULL "ReawakeR" by LiSA (feat. Felix of Stray Kids) (Lyrics)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Solo Leveling Season 2 - Opening FULL "ReawakeR" by LiSA (feat. Felix of Stray Kids) (Lyrics)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=rzbjF2DRv1c" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=rzbjF2DRv1c</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=BgaIoM0T3cQ', '_blank');">
+                <div class="song-rank">#16</div>
+                <img src="https://img.youtube.com/vi/BgaIoM0T3cQ/hqdefault.jpg" alt="玉置成実「Believe」Music Video" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">玉置成実「Believe」Music Video</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=BgaIoM0T3cQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=BgaIoM0T3cQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=QKXi08chD2E', '_blank');">
+                <div class="song-rank">#17</div>
+                <img src="https://img.youtube.com/vi/QKXi08chD2E/hqdefault.jpg" alt="Tokyo Ghoul OP/Opening Full「Unravel - TK」" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Tokyo Ghoul OP/Opening Full「Unravel - TK」</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=QKXi08chD2E" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=QKXi08chD2E</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=sA7qYWH-UvU', '_blank');">
+                <div class="song-rank">#18</div>
+                <img src="https://img.youtube.com/vi/sA7qYWH-UvU/hqdefault.jpg" alt="Shingeki no Kyojin | Linked Horizon -  紅蓮の弓矢 | Opening 1 | Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Shingeki no Kyojin | Linked Horizon -  紅蓮の弓矢 | Opening 1 | Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=sA7qYWH-UvU" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=sA7qYWH-UvU</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=jZNbDDnVVoQ', '_blank');">
+                <div class="song-rank">#19</div>
+                <img src="https://img.youtube.com/vi/jZNbDDnVVoQ/hqdefault.jpg" alt="Oshi No Ko - Opening 1 (Idol) | 4K UHD Creditless | Subtitles" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Oshi No Ko - Opening 1 (Idol) | 4K UHD Creditless | Subtitles</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=jZNbDDnVVoQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=jZNbDDnVVoQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=6S1Ql39yAtQ', '_blank');">
+                <div class="song-rank">#20</div>
+                <img src="https://img.youtube.com/vi/6S1Ql39yAtQ/hqdefault.jpg" alt="No pain, No game / ナノ Music Video" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">No pain, No game / ナノ Music Video</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=6S1Ql39yAtQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=6S1Ql39yAtQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=uF7eT3nhyZ0', '_blank');">
+                <div class="song-rank">#21</div>
+                <img src="https://img.youtube.com/vi/uF7eT3nhyZ0/hqdefault.jpg" alt="Sousou no Frieren - Opening 2 FULL "Haru (Sunny)" by Yorushika (Lyrics)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Sousou no Frieren - Opening 2 FULL "Haru (Sunny)" by Yorushika (Lyrics)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=uF7eT3nhyZ0" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=uF7eT3nhyZ0</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=AwHapidVQlI', '_blank');">
+                <div class="song-rank">#22</div>
+                <img src="https://img.youtube.com/vi/AwHapidVQlI/hqdefault.jpg" alt="Re:Zero Season 2 - Opening Full『Realize』by Konomi Suzuki" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Re:Zero Season 2 - Opening Full『Realize』by Konomi Suzuki</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=AwHapidVQlI" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=AwHapidVQlI</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=fWRPihlt2ho', '_blank');">
+                <div class="song-rank">#23</div>
+                <img src="https://img.youtube.com/vi/fWRPihlt2ho/hqdefault.jpg" alt="Your Lie in April OP/Opening Theme - Hikaru Nara" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Your Lie in April OP/Opening Theme - Hikaru Nara</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=fWRPihlt2ho" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=fWRPihlt2ho</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=SBQprWeOx8g', '_blank');">
+                <div class="song-rank">#24</div>
+                <img src="https://img.youtube.com/vi/SBQprWeOx8g/hqdefault.jpg" alt="「Steins;Gate」Opening FULL【AMV】" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">「Steins;Gate」Opening FULL【AMV】</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=SBQprWeOx8g" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=SBQprWeOx8g</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=elyXcwunIYA', '_blank');">
+                <div class="song-rank">#25</div>
+                <img src="https://img.youtube.com/vi/elyXcwunIYA/hqdefault.jpg" alt="Fullmetal Alchemist: Brotherhood - Opening 1 [4K 60FPS | Creditless | CC]" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Fullmetal Alchemist: Brotherhood - Opening 1 [4K 60FPS | Creditless | CC]</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=elyXcwunIYA" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=elyXcwunIYA</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=AcJUYGD8zjk', '_blank');">
+                <div class="song-rank">#26</div>
+                <img src="https://img.youtube.com/vi/AcJUYGD8zjk/hqdefault.jpg" alt="Paradox / Survive Said The Prophet ヴィンランド・サガ SEASON 2 コラボレーションMV" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Paradox / Survive Said The Prophet ヴィンランド・サガ SEASON 2 コラボレーションMV</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=AcJUYGD8zjk" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=AcJUYGD8zjk</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=PxhezW8nhCM', '_blank');">
+                <div class="song-rank">#27</div>
+                <img src="https://img.youtube.com/vi/PxhezW8nhCM/hqdefault.jpg" alt="『SPY x FAMILY』Opening 2 Full 'SOUVENIR' Lyrics (BUMP OF CHICKEN)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">『SPY x FAMILY』Opening 2 Full 'SOUVENIR' Lyrics (BUMP OF CHICKEN)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=PxhezW8nhCM" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=PxhezW8nhCM</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=QImBolnTVH8', '_blank');">
+                <div class="song-rank">#28</div>
+                <img src="https://img.youtube.com/vi/QImBolnTVH8/hqdefault.jpg" alt="[Official Video] JAM Project - THE HERO !! -  "One Punch Man" Opening Theme ワンパンマン" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">[Official Video] JAM Project - THE HERO !! -  "One Punch Man" Opening Theme ワンパンマン</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=QImBolnTVH8" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=QImBolnTVH8</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=vGLoaXD3sNE', '_blank');">
+                <div class="song-rank">#29</div>
+                <img src="https://img.youtube.com/vi/vGLoaXD3sNE/hqdefault.jpg" alt="Realize Gundam Seed - Nami Tamaki (HD Audio)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Realize Gundam Seed - Nami Tamaki (HD Audio)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=vGLoaXD3sNE" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=vGLoaXD3sNE</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=VrXYXv0IjwM', '_blank');">
+                <div class="song-rank">#30</div>
+                <img src="https://img.youtube.com/vi/VrXYXv0IjwM/hqdefault.jpg" alt="『Lyrics AMV』 Angel Beats! OP Full 【 My Soul, Your Beats! - Lia 】" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">『Lyrics AMV』 Angel Beats! OP Full 【 My Soul, Your Beats! - Lia 】</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=VrXYXv0IjwM" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=VrXYXv0IjwM</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=IGWtNqeZMp0', '_blank');">
+                <div class="song-rank">#31</div>
+                <img src="https://img.youtube.com/vi/IGWtNqeZMp0/hqdefault.jpg" alt="Demon Slayer: Kimetsu no Yaiba Opening Full with lyrics [LiSA - Gurenge]" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Demon Slayer: Kimetsu no Yaiba Opening Full with lyrics [LiSA - Gurenge]</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=IGWtNqeZMp0" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=IGWtNqeZMp0</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=-damq6jWDjc', '_blank');">
+                <div class="song-rank">#32</div>
+                <img src="https://img.youtube.com/vi/-damq6jWDjc/hqdefault.jpg" alt="Zero Ichi 01 [HD] - Undead Unluck アンデッドアンラック Lyrics | Queen Bee 女王蜂" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Zero Ichi 01 [HD] - Undead Unluck アンデッドアンラック Lyrics | Queen Bee 女王蜂</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=-damq6jWDjc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=-damq6jWDjc</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=_d_for2jnQ0', '_blank');">
+                <div class="song-rank">#33</div>
+                <img src="https://img.youtube.com/vi/_d_for2jnQ0/hqdefault.jpg" alt="Ash Like Snow - Opening 2 Gundam 00 + Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Ash Like Snow - Opening 2 Gundam 00 + Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=_d_for2jnQ0" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=_d_for2jnQ0</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=0YF8vecQWYs', '_blank');">
+                <div class="song-rank">#34</div>
+                <img src="https://img.youtube.com/vi/0YF8vecQWYs/hqdefault.jpg" alt="美波「カワキヲアメク」MV" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">美波「カワキヲアメク」MV</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=0YF8vecQWYs" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=0YF8vecQWYs</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=ryXN9axEreU', '_blank');">
+                <div class="song-rank">#35</div>
+                <img src="https://img.youtube.com/vi/ryXN9axEreU/hqdefault.jpg" alt="Ami Tokito School Rumble Second Term Opening: Sentimental Generation" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Ami Tokito School Rumble Second Term Opening: Sentimental Generation</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=ryXN9axEreU" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=ryXN9axEreU</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=hq8j8FdFm4Q', '_blank');">
+                <div class="song-rank">#36</div>
+                <img src="https://img.youtube.com/vi/hq8j8FdFm4Q/hqdefault.jpg" alt="The Dangers In My Heart Season 2 -『Boku wa...』by Atarayo - Opening full" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">The Dangers In My Heart Season 2 -『Boku wa...』by Atarayo - Opening full</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=hq8j8FdFm4Q" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=hq8j8FdFm4Q</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=6TAuXb70MTo', '_blank');">
+                <div class="song-rank">#37</div>
+                <img src="https://img.youtube.com/vi/6TAuXb70MTo/hqdefault.jpg" alt="Heavenly Delusion - Opening Full『innocent arrogance』by BiSH" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Heavenly Delusion - Opening Full『innocent arrogance』by BiSH</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=6TAuXb70MTo" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=6TAuXb70MTo</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=-5M4lbEpn6c', '_blank');">
+                <div class="song-rank">#38</div>
+                <img src="https://img.youtube.com/vi/-5M4lbEpn6c/hqdefault.jpg" alt="BEASTARS Season 2 OP (Clean) | Kaibutsu - YOASOBI | Netflix Anime" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">BEASTARS Season 2 OP (Clean) | Kaibutsu - YOASOBI | Netflix Anime</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=-5M4lbEpn6c" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=-5M4lbEpn6c</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=nJ6A6GC_ki4', '_blank');">
+                <div class="song-rank">#39</div>
+                <img src="https://img.youtube.com/vi/nJ6A6GC_ki4/hqdefault.jpg" alt="ASIAN KUNG-FU GENERATION - Haruka Kanata" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">ASIAN KUNG-FU GENERATION - Haruka Kanata</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=nJ6A6GC_ki4" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=nJ6A6GC_ki4</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=IHhNTt3oxtY&list=PLSVr-LAssYlCd7QsukpIOq68tsQPStaEX', '_blank');">
+                <div class="song-rank">#40</div>
+                <img src="https://img.youtube.com/vi/IHhNTt3oxtY/hqdefault.jpg" alt="One Piece OP 1 - We Are! Lyrics" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">One Piece OP 1 - We Are! Lyrics</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=IHhNTt3oxtY&list=PLSVr-LAssYlCd7QsukpIOq68tsQPStaEX" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=IHhNTt3oxtY&list=PLSVr-LAssYlCd7QsukpIOq68tsQPStaEX</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=piEyKyJ4pFg', '_blank');">
+                <div class="song-rank">#41</div>
+                <img src="https://img.youtube.com/vi/piEyKyJ4pFg/hqdefault.jpg" alt="Ya Boy Kongming Opening Full『Chitty Chitty Bang Bang - QUEENDOM』" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Ya Boy Kongming Opening Full『Chitty Chitty Bang Bang - QUEENDOM』</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=piEyKyJ4pFg" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=piEyKyJ4pFg</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=TZjCVufmctQ', '_blank');">
+                <div class="song-rank">#42</div>
+                <img src="https://img.youtube.com/vi/TZjCVufmctQ/hqdefault.jpg" alt="Ah! My Goddess FULL Opening Theme "Open Your Mind"" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Ah! My Goddess FULL Opening Theme "Open Your Mind"</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=TZjCVufmctQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=TZjCVufmctQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=tkNfLYr-MyM', '_blank');">
+                <div class="song-rank">#43</div>
+                <img src="https://img.youtube.com/vi/tkNfLYr-MyM/hqdefault.jpg" alt="Change the World Inuyasha opening 1 full SPOILER ALERT" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Change the World Inuyasha opening 1 full SPOILER ALERT</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=tkNfLYr-MyM" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=tkNfLYr-MyM</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=dlFA0Zq1k2A', '_blank');">
+                <div class="song-rank">#44</div>
+                <img src="https://img.youtube.com/vi/dlFA0Zq1k2A/hqdefault.jpg" alt="KANA-BOON - Silhouette" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">KANA-BOON - Silhouette</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=dlFA0Zq1k2A" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=dlFA0Zq1k2A</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=uC8sc0cQa9M', '_blank');">
+                <div class="song-rank">#45</div>
+                <img src="https://img.youtube.com/vi/uC8sc0cQa9M/hqdefault.jpg" alt="Dragon Ball GT (AMV) - Dan Dan Kokoro Hikareteku" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Dragon Ball GT (AMV) - Dan Dan Kokoro Hikareteku</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=uC8sc0cQa9M" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=uC8sc0cQa9M</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=kmL3EuiiWXM', '_blank');">
+                <div class="song-rank">#46</div>
+                <img src="https://img.youtube.com/vi/kmL3EuiiWXM/hqdefault.jpg" alt="Naruto Shippuden Opening 4 | Closer (HD)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Naruto Shippuden Opening 4 | Closer (HD)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=kmL3EuiiWXM" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=kmL3EuiiWXM</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=YvvlGma6COM', '_blank');">
+                <div class="song-rank">#47</div>
+                <img src="https://img.youtube.com/vi/YvvlGma6COM/hqdefault.jpg" alt="Rurouni Kenshin - Opening 1 | 4K 60FPS Creditless" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Rurouni Kenshin - Opening 1 | 4K 60FPS Creditless</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=YvvlGma6COM" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=YvvlGma6COM</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=B3ASnFmus3Y', '_blank');">
+                <div class="song-rank">#48</div>
+                <img src="https://img.youtube.com/vi/B3ASnFmus3Y/hqdefault.jpg" alt="いいよ - Daoko (Official Audio)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">いいよ - Daoko (Official Audio)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=B3ASnFmus3Y" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=B3ASnFmus3Y</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=pYnLO7MVKno', '_blank');">
+                <div class="song-rank">#49</div>
+                <img src="https://img.youtube.com/vi/pYnLO7MVKno/hqdefault.jpg" alt="CHA-LA HEAD CHA-LA - Dragonball Z (Opening Theme) [OST Full]" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">CHA-LA HEAD CHA-LA - Dragonball Z (Opening Theme) [OST Full]</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=pYnLO7MVKno" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=pYnLO7MVKno</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=b_ctlDcxZbc', '_blank');">
+                <div class="song-rank">#50</div>
+                <img src="https://img.youtube.com/vi/b_ctlDcxZbc/hqdefault.jpg" alt="Shaman King Full English Opening ''To Be Shaman King!'' (Extended/Remix)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Shaman King Full English Opening ''To Be Shaman King!'' (Extended/Remix)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=b_ctlDcxZbc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=b_ctlDcxZbc</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=sKzyoLHTffE', '_blank');">
+                <div class="song-rank">#52</div>
+                <img src="https://img.youtube.com/vi/sKzyoLHTffE/hqdefault.jpg" alt="Urusei Yatsura OP 1 Full「AMV」-  "AIUE"" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Urusei Yatsura OP 1 Full「AMV」-  "AIUE"</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=sKzyoLHTffE" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=sKzyoLHTffE</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=5txHGxJRwtQ', '_blank');">
+                <div class="song-rank">#53</div>
+                <img src="https://img.youtube.com/vi/5txHGxJRwtQ/hqdefault.jpg" alt="Sailor Moon Opening (English) *HD*" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Sailor Moon Opening (English) *HD*</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=5txHGxJRwtQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=5txHGxJRwtQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=dTDzDxv-YDo', '_blank');">
+                <div class="song-rank">#54</div>
+                <img src="https://img.youtube.com/vi/dTDzDxv-YDo/hqdefault.jpg" alt="Kimetsu no Yaiba Season 3 - Opening FULL "Kizuna no Kiseki" by MAN WITH A MISSION x milet (Lyrics)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Kimetsu no Yaiba Season 3 - Opening FULL "Kizuna no Kiseki" by MAN WITH A MISSION x milet (Lyrics)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=dTDzDxv-YDo" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=dTDzDxv-YDo</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=7FDRQifEMUQ', '_blank');">
+                <div class="song-rank">#55</div>
+                <img src="https://img.youtube.com/vi/7FDRQifEMUQ/hqdefault.jpg" alt="seisyun complex" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">seisyun complex</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=7FDRQifEMUQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=7FDRQifEMUQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=xMBi1w_16xA&list=PLj8m-CMbOpe3cCVbDMFwMRLgr-BAk6s68&index=2', '_blank');">
+                <div class="song-rank">#56</div>
+                <img src="https://img.youtube.com/vi/xMBi1w_16xA/hqdefault.jpg" alt="Tatsuya Kitani - Jikai Yokoku (Preview of Me) (Go! Go! Loser Ranger! Opening)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Tatsuya Kitani - Jikai Yokoku (Preview of Me) (Go! Go! Loser Ranger! Opening)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=xMBi1w_16xA&list=PLj8m-CMbOpe3cCVbDMFwMRLgr-BAk6s68&index=2" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=xMBi1w_16xA&list=PLj8m-CMbOpe3cCVbDMFwMRLgr-BAk6s68&index=2</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=3eytpBOkOFA', '_blank');">
+                <div class="song-rank">#57</div>
+                <img src="https://img.youtube.com/vi/3eytpBOkOFA/hqdefault.jpg" alt="YOASOBI「祝福」Official Music Video (『機動戦士ガンダム 水星の魔女』オープニングテーマ)" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">YOASOBI「祝福」Official Music Video (『機動戦士ガンダム 水星の魔女』オープニングテーマ)</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=3eytpBOkOFA" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=3eytpBOkOFA</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=5DjFpPSuGR0', '_blank');">
+                <div class="song-rank">#58</div>
+                <img src="https://img.youtube.com/vi/5DjFpPSuGR0/hqdefault.jpg" alt="Survive Said The Prophet - MUKANJYO | Official Music Video" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Survive Said The Prophet - MUKANJYO | Official Music Video</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=5DjFpPSuGR0" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=5DjFpPSuGR0</a></div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p>Created by a Bou for a Bou | Made with ❤️</p>
+        </footer>
+    </div>
+</body>
+</html>
