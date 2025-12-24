@@ -40,6 +40,7 @@
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script src="../js/ranking-manager.js"></script>
     <script>
         class ChristmasMoviesManager extends RankingManager {
@@ -56,8 +57,63 @@
             }
         }
 
+        function createSnowfall() {
+            const body = document.body;
+            const snowflakeCount = 15;
+
+            // Create a dedicated snowflake container
+            const snowflakeContainer = document.createElement('div');
+            snowflakeContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                pointer-events: none;
+                z-index: 1;
+                overflow: visible;
+            `;
+            body.insertBefore(snowflakeContainer, body.firstChild);
+
+            for (let i = 0; i < snowflakeCount; i++) {
+                const snowflake = document.createElement('div');
+                const size = Math.random() * 6 + 3;
+                const left = Math.random() * 100;
+                const duration = Math.random() * 8000 + 12000; // Slower: 12s-20s
+                const delay = Math.random() * 3000;
+
+                snowflake.style.cssText = `
+                    position: fixed;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: white;
+                    border-radius: 50%;
+                    opacity: 0.7;
+                    left: ${left}%;
+                    top: -${size}px;
+                    box-shadow: 0 0 ${size * 2}px rgba(255, 255, 255, 0.9);
+                    pointer-events: none;
+                `;
+
+                snowflakeContainer.appendChild(snowflake);
+
+                // Animate each snowflake with continuous loop
+                anime.timeline({ loop: true })
+                    .add({
+                        targets: snowflake,
+                        translateY: window.innerHeight + 50,
+                        translateX: Math.sin(i) * 100,
+                        opacity: [0, 0.7, 0],
+                        duration: duration,
+                        easing: 'easeInOutQuad',
+                        delay: delay
+                    }, 0);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             new ChristmasMoviesManager();
+            createSnowfall();
         });
     </script>
 </body>
