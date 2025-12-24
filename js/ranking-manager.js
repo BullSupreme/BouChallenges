@@ -108,49 +108,88 @@ class RankingManager {
         console.log(`Starting async duration fetch for video ${videoId}`);
         let duration = '';
 
-        // Try Noembed API first with timeout
+        // Try YouTube API via free service (YT-DL like)
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            const noembed_url = `https://noembed.com/embed?url=${encodeURIComponent(url)}`;
-            console.log(`Trying Noembed API: ${noembed_url}`);
-            const response = await fetch(noembed_url, { signal: controller.signal });
+            const apiUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+            console.log(`Trying oEmbed API: ${apiUrl}`);
+            const response = await fetch(apiUrl, { signal: controller.signal });
             clearTimeout(timeoutId);
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('Noembed response:', data);
-                if (data.duration) {
-                    duration = this.formatDuration(data.duration);
-                    console.log(`Got duration from Noembed: ${duration}`);
-                    this.updateDurationForVideo(videoId, duration);
-                    return;
+                console.log('oEmbed data:', data);
+
+                // oEmbed doesn't include duration, so try extracting from HTML if available
+                if (data.html) {
+                    const durationMatch = data.html.match(/duration[="](\d+)/i);
+                    if (durationMatch && durationMatch[1]) {
+                        duration = this.formatDuration(parseInt(durationMatch[1]));
+                        console.log(`Got duration from oEmbed HTML: ${duration}`);
+                        this.updateDurationForVideo(videoId, duration);
+                        return;
+                    }
                 }
             }
         } catch (error) {
-            console.log('Noembed API failed:', error);
+            console.log('oEmbed API failed:', error);
         }
 
-        // If Noembed didn't work, try fetching from YouTube with timeout
+        // Fallback: Try fetching from YouTube page directly
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            const timeoutId = setTimeout(() => controller.abort(), 8000);
 
             const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
-            console.log(`Trying YouTube proxy: ${proxyUrl}`);
+            console.log(`Trying YouTube proxy with multiple patterns: ${proxyUrl}`);
             const response = await fetch(proxyUrl, { signal: controller.signal });
             clearTimeout(timeoutId);
 
             if (response.ok) {
                 const html = await response.text();
-                const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
-                console.log('Duration match:', durationMatch);
-                if (durationMatch && durationMatch[1]) {
-                    duration = this.formatDuration(parseInt(durationMatch[1]));
+
+                // Try multiple patterns to find duration
+                let durationSeconds = null;
+
+                // Pattern 1: "lengthSeconds":"XXXX"
+                let match = html.match(/"lengthSeconds"\s*:\s*"(\d+)"/);
+                if (match && match[1]) {
+                    durationSeconds = parseInt(match[1]);
+                    console.log(`Found duration via lengthSeconds: ${durationSeconds}`);
+                }
+
+                // Pattern 2: alternativeTitle with duration info
+                if (!durationSeconds) {
+                    match = html.match(/"duration"\s*:\s*(\d+)/);
+                    if (match && match[1]) {
+                        durationSeconds = parseInt(match[1]);
+                        console.log(`Found duration via duration field: ${durationSeconds}`);
+                    }
+                }
+
+                // Pattern 3: Check if HTML contains any timestamp format
+                if (!durationSeconds) {
+                    // Look for ISO 8601 duration format
+                    match = html.match(/"duration"\s*:\s*"PT(\d+)H(\d+)M(\d+)S"/);
+                    if (match) {
+                        const hours = parseInt(match[1]) || 0;
+                        const minutes = parseInt(match[2]) || 0;
+                        const seconds = parseInt(match[3]) || 0;
+                        durationSeconds = hours * 3600 + minutes * 60 + seconds;
+                        console.log(`Found duration via ISO format: ${durationSeconds}`);
+                    }
+                }
+
+                if (durationSeconds && durationSeconds > 0) {
+                    duration = this.formatDuration(durationSeconds);
                     console.log(`Got duration from YouTube: ${duration}`);
                     this.updateDurationForVideo(videoId, duration);
+                    return;
+                } else {
+                    console.log('Could not extract duration from YouTube HTML, will skip');
                 }
             }
         } catch (error) {
