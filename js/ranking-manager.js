@@ -78,6 +78,7 @@ class RankingManager {
         const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
         let title = 'YouTube Video';
+        let duration = '';
         try {
             const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
             const response = await fetch(oembedUrl);
@@ -89,6 +90,20 @@ class RankingManager {
             console.log('Could not fetch YouTube title via oEmbed, using default');
         }
 
+        // Try to fetch duration using YouTube Noembed API (no API key required)
+        try {
+            const noembed_url = `https://noembed.com/embed?url=${encodeURIComponent(url)}`;
+            const response = await fetch(noembed_url);
+            if (response.ok) {
+                const data = await response.json();
+                if (data.duration) {
+                    duration = this.formatDuration(data.duration);
+                }
+            }
+        } catch (error) {
+            console.log('Could not fetch duration, continuing without it');
+        }
+
         return {
             platform: 'YouTube',
             title: title,
@@ -96,7 +111,20 @@ class RankingManager {
             thumbnailUrl: thumbnailUrl,
             url: url,
             videoId: videoId,
+            duration: duration,
         };
+    }
+
+    formatDuration(seconds) {
+        if (!seconds) return '';
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+
+        if (hours > 0) {
+            return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        return `${minutes}:${String(secs).padStart(2, '0')}`;
     }
 
     async getSpotifyData(url) {
@@ -613,6 +641,7 @@ class RankingManager {
         `;
 
         const expandedClass = isPlayingVideo ? 'youtube-expanded' : '';
+        const durationDisplay = item.duration ? `<div class="song-duration">⏱️ ${this.escapeHtml(item.duration)}</div>` : '';
         return `
             <div class="song-item ${rankColor} ${expandedClass}" data-item-index="${index}" draggable="true">
                 <div class="rank-controls">
@@ -626,6 +655,7 @@ class RankingManager {
                         ${this.escapeHtml(displayText)}
                         ${externalButton}
                     </div>
+                    ${durationDisplay}
                     <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}">
                 </div>
                 <button class="remove-btn" data-index="${index}">×</button>
