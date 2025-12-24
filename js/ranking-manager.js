@@ -108,93 +108,53 @@ class RankingManager {
         console.log(`Starting async duration fetch for video ${videoId}`);
         let duration = '';
 
-        // Try YouTube API via free service (YT-DL like)
+        // Try using InvidiaAPI (privacy-friendly YouTube API)
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            const apiUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
-            console.log(`Trying oEmbed API: ${apiUrl}`);
+            const apiUrl = `https://inv.nadeko.net/api/v1/videos/${videoId}`;
+            console.log(`Trying InvidiaAPI: ${apiUrl}`);
             const response = await fetch(apiUrl, { signal: controller.signal });
             clearTimeout(timeoutId);
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('oEmbed data:', data);
+                console.log('InvidiaAPI response:', data);
 
-                // oEmbed doesn't include duration, so try extracting from HTML if available
-                if (data.html) {
-                    const durationMatch = data.html.match(/duration[="](\d+)/i);
-                    if (durationMatch && durationMatch[1]) {
-                        duration = this.formatDuration(parseInt(durationMatch[1]));
-                        console.log(`Got duration from oEmbed HTML: ${duration}`);
-                        this.updateDurationForVideo(videoId, duration);
-                        return;
-                    }
+                if (data.length && data.length > 0) {
+                    duration = this.formatDuration(data.length);
+                    console.log(`Got duration from InvidiaAPI: ${duration}`);
+                    this.updateDurationForVideo(videoId, duration);
+                    return;
                 }
             }
         } catch (error) {
-            console.log('oEmbed API failed:', error);
+            console.log('InvidiaAPI failed:', error);
         }
 
-        // Fallback: Try fetching from YouTube page directly
+        // Fallback: Try returnyoutubedislikeapi
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 8000);
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-            const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
-            console.log(`Trying YouTube proxy with multiple patterns: ${proxyUrl}`);
-            const response = await fetch(proxyUrl, { signal: controller.signal });
+            const apiUrl = `https://returnyoutubedislikeapi.com/api/v1/video?id=${videoId}`;
+            console.log(`Trying ReturnYoutubeDislikeAPI: ${apiUrl}`);
+            const response = await fetch(apiUrl, { signal: controller.signal });
             clearTimeout(timeoutId);
 
             if (response.ok) {
-                const html = await response.text();
+                const data = await response.json();
+                console.log('ReturnYoutubeDislikeAPI response:', data);
 
-                // Try multiple patterns to find duration
-                let durationSeconds = null;
-
-                // Pattern 1: "lengthSeconds":"XXXX"
-                let match = html.match(/"lengthSeconds"\s*:\s*"(\d+)"/);
-                if (match && match[1]) {
-                    durationSeconds = parseInt(match[1]);
-                    console.log(`Found duration via lengthSeconds: ${durationSeconds}`);
-                }
-
-                // Pattern 2: alternativeTitle with duration info
-                if (!durationSeconds) {
-                    match = html.match(/"duration"\s*:\s*(\d+)/);
-                    if (match && match[1]) {
-                        durationSeconds = parseInt(match[1]);
-                        console.log(`Found duration via duration field: ${durationSeconds}`);
-                    }
-                }
-
-                // Pattern 3: Check if HTML contains any timestamp format
-                if (!durationSeconds) {
-                    // Look for ISO 8601 duration format
-                    match = html.match(/"duration"\s*:\s*"PT(\d+)H(\d+)M(\d+)S"/);
-                    if (match) {
-                        const hours = parseInt(match[1]) || 0;
-                        const minutes = parseInt(match[2]) || 0;
-                        const seconds = parseInt(match[3]) || 0;
-                        durationSeconds = hours * 3600 + minutes * 60 + seconds;
-                        console.log(`Found duration via ISO format: ${durationSeconds}`);
-                    }
-                }
-
-                if (durationSeconds && durationSeconds > 0) {
-                    duration = this.formatDuration(durationSeconds);
-                    console.log(`Got duration from YouTube: ${duration}`);
-                    this.updateDurationForVideo(videoId, duration);
-                    return;
-                } else {
-                    console.log('Could not extract duration from YouTube HTML, will skip');
-                }
+                // This API might have duration info or we can use it for other features
+                // For now just log
             }
         } catch (error) {
-            console.log('Could not fetch duration from YouTube:', error);
+            console.log('ReturnYoutubeDislikeAPI failed:', error);
         }
+
+        console.log('Duration fetch completed, no reliable source found');
     }
 
     updateDurationForVideo(videoId, duration) {
