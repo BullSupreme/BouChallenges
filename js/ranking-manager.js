@@ -105,6 +105,7 @@ class RankingManager {
     }
 
     async fetchYouTubeDurationAsync(videoId, url) {
+        console.log(`Starting async duration fetch for video ${videoId}`);
         let duration = '';
 
         // Try Noembed API first with timeout
@@ -113,19 +114,22 @@ class RankingManager {
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
             const noembed_url = `https://noembed.com/embed?url=${encodeURIComponent(url)}`;
+            console.log(`Trying Noembed API: ${noembed_url}`);
             const response = await fetch(noembed_url, { signal: controller.signal });
             clearTimeout(timeoutId);
 
             if (response.ok) {
                 const data = await response.json();
+                console.log('Noembed response:', data);
                 if (data.duration) {
                     duration = this.formatDuration(data.duration);
+                    console.log(`Got duration from Noembed: ${duration}`);
                     this.updateDurationForVideo(videoId, duration);
                     return;
                 }
             }
         } catch (error) {
-            console.log('Noembed API failed');
+            console.log('Noembed API failed:', error);
         }
 
         // If Noembed didn't work, try fetching from YouTube with timeout
@@ -135,19 +139,22 @@ class RankingManager {
 
             const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
+            console.log(`Trying YouTube proxy: ${proxyUrl}`);
             const response = await fetch(proxyUrl, { signal: controller.signal });
             clearTimeout(timeoutId);
 
             if (response.ok) {
                 const html = await response.text();
                 const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
+                console.log('Duration match:', durationMatch);
                 if (durationMatch && durationMatch[1]) {
                     duration = this.formatDuration(parseInt(durationMatch[1]));
+                    console.log(`Got duration from YouTube: ${duration}`);
                     this.updateDurationForVideo(videoId, duration);
                 }
             }
         } catch (error) {
-            console.log('Could not fetch duration from YouTube');
+            console.log('Could not fetch duration from YouTube:', error);
         }
     }
 
@@ -155,9 +162,13 @@ class RankingManager {
         // Find the item with this videoId and update it
         const itemIndex = this.items.findIndex(item => item.videoId === videoId);
         if (itemIndex !== -1) {
+            console.log(`Updating duration for video ${videoId}: ${duration}`);
             this.items[itemIndex].duration = duration;
             this.saveItems();
             this.renderItems();
+            console.log('Items re-rendered with duration');
+        } else {
+            console.log(`Video ${videoId} not found in items`);
         }
     }
 
