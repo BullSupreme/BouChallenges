@@ -101,19 +101,31 @@
 
         // Anime.js animations
         document.addEventListener('DOMContentLoaded', function() {
-            // Create animated background particles
-            createBackgroundParticles();
-
             // Animate challenge cards on page load
             animateChallengeCards();
+
+            // Create animated background particles (after a short delay)
+            setTimeout(createBackgroundParticles, 100);
         });
 
         function createBackgroundParticles() {
-            const container = document.querySelector('main');
-            if (!container) return;
-
+            const body = document.body;
             const colors = ['#a855f7', '#06b6d4', '#10b981', '#ec4899', '#3b82f6'];
             const particleCount = 8;
+
+            // Create a dedicated particle container
+            const particleContainer = document.createElement('div');
+            particleContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: -1;
+                overflow: hidden;
+            `;
+            body.insertBefore(particleContainer, body.firstChild);
 
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -132,11 +144,9 @@
                     left: ${left}%;
                     top: ${top}%;
                     pointer-events: none;
-                    z-index: 0;
                 `;
 
-                container.style.position = 'relative';
-                container.insertBefore(particle, container.firstChild);
+                particleContainer.appendChild(particle);
 
                 // Animate each particle
                 anime.timeline({ loop: true })
@@ -165,8 +175,8 @@
                 card.style.transform = 'translateY(30px)';
             });
 
-            // Animate cards with stagger
-            anime.stagger.animate(cards, {
+            // Animate cards with stagger entrance
+            anime({
                 targets: cards,
                 opacity: [0, 1],
                 translateY: [30, 0],
@@ -175,34 +185,13 @@
                 delay: anime.stagger(100, { start: 200 })
             });
 
-            // Add continuous floating animation on hover
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    anime({
-                        targets: this,
-                        translateY: -10,
-                        duration: 400,
-                        easing: 'easeOutQuad'
-                    });
-                });
-
-                card.addEventListener('mouseleave', function() {
-                    anime({
-                        targets: this,
-                        translateY: 0,
-                        duration: 400,
-                        easing: 'easeOutQuad'
-                    });
-                });
-            });
-
-            // Gentle floating animation after cards load
+            // Gentle floating animation loop
             anime({
                 targets: '.challenge-card',
                 translateY: [0, -8, 0],
                 duration: 4000,
                 easing: 'easeInOutSine',
-                delay: anime.stagger(100),
+                delay: anime.stagger(100, { start: 1000 }),
                 loop: true
             });
         }
