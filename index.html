@@ -55,6 +55,7 @@
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script>
         function setUsername() {
             const input = document.getElementById('usernameInput');
@@ -97,6 +98,114 @@
                 });
             }
         });
+
+        // Anime.js animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create animated background particles
+            createBackgroundParticles();
+
+            // Animate challenge cards on page load
+            animateChallengeCards();
+        });
+
+        function createBackgroundParticles() {
+            const container = document.querySelector('main');
+            if (!container) return;
+
+            const colors = ['#a855f7', '#06b6d4', '#10b981', '#ec4899', '#3b82f6'];
+            const particleCount = 8;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                const size = Math.random() * 60 + 20;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+
+                particle.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    background: ${color};
+                    border-radius: ${Math.random() > 0.5 ? '50%' : '10px'};
+                    opacity: 0.05;
+                    left: ${left}%;
+                    top: ${top}%;
+                    pointer-events: none;
+                    z-index: 0;
+                `;
+
+                container.style.position = 'relative';
+                container.insertBefore(particle, container.firstChild);
+
+                // Animate each particle
+                anime.timeline({ loop: true })
+                    .add({
+                        targets: particle,
+                        translateY: [
+                            { value: -80, duration: 6000 + Math.random() * 4000, easing: 'easeInOutQuad' },
+                            { value: 80, duration: 6000 + Math.random() * 4000, easing: 'easeInOutQuad' }
+                        ],
+                        translateX: Math.random() * 100 - 50,
+                        rotate: 360,
+                        opacity: [
+                            { value: 0.1, duration: 3000, easing: 'easeInOutQuad' },
+                            { value: 0.05, duration: 6000, easing: 'easeInOutQuad' }
+                        ]
+                    }, 0);
+            }
+        }
+
+        function animateChallengeCards() {
+            const cards = document.querySelectorAll('.challenge-card');
+
+            // Set initial state
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+            });
+
+            // Animate cards with stagger
+            anime.stagger.animate(cards, {
+                targets: cards,
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 800,
+                easing: 'easeOutElastic(1, .6)',
+                delay: anime.stagger(100, { start: 200 })
+            });
+
+            // Add continuous floating animation on hover
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    anime({
+                        targets: this,
+                        translateY: -10,
+                        duration: 400,
+                        easing: 'easeOutQuad'
+                    });
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    anime({
+                        targets: this,
+                        translateY: 0,
+                        duration: 400,
+                        easing: 'easeOutQuad'
+                    });
+                });
+            });
+
+            // Gentle floating animation after cards load
+            anime({
+                targets: '.challenge-card',
+                translateY: [0, -8, 0],
+                duration: 4000,
+                easing: 'easeInOutSine',
+                delay: anime.stagger(100),
+                loop: true
+            });
+        }
     </script>
 </body>
 </html>
