@@ -616,13 +616,6 @@ main {
     font-weight: 500;
 }
 
-.song-duration {
-    font-size: 0.85em;
-    color: var(--accent-color);
-    margin: 5px 0;
-    font-weight: 500;
-}
-
 .song-actions {
     display: flex;
     gap: 8px;

@@ -78,7 +78,6 @@ class RankingManager {
         const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
         let title = 'YouTube Video';
-        let duration = '';
         try {
             const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
             const response = await fetch(oembedUrl);
@@ -90,9 +89,6 @@ class RankingManager {
             console.log('Could not fetch YouTube title via oEmbed, using default');
         }
 
-        // Fetch duration in background (non-blocking)
-        this.fetchYouTubeDurationAsync(videoId, url);
-
         return {
             platform: 'YouTube',
             title: title,
@@ -100,87 +96,7 @@ class RankingManager {
             thumbnailUrl: thumbnailUrl,
             url: url,
             videoId: videoId,
-            duration: duration,
         };
-    }
-
-    async fetchYouTubeDurationAsync(videoId, url) {
-        console.log(`Starting async duration fetch for video ${videoId}`);
-        let duration = '';
-
-        // Try using InvidiaAPI (privacy-friendly YouTube API)
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-            const apiUrl = `https://inv.nadeko.net/api/v1/videos/${videoId}`;
-            console.log(`Trying InvidiaAPI: ${apiUrl}`);
-            const response = await fetch(apiUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('InvidiaAPI response:', data);
-
-                if (data.length && data.length > 0) {
-                    duration = this.formatDuration(data.length);
-                    console.log(`Got duration from InvidiaAPI: ${duration}`);
-                    this.updateDurationForVideo(videoId, duration);
-                    return;
-                }
-            }
-        } catch (error) {
-            console.log('InvidiaAPI failed:', error);
-        }
-
-        // Fallback: Try returnyoutubedislikeapi
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-            const apiUrl = `https://returnyoutubedislikeapi.com/api/v1/video?id=${videoId}`;
-            console.log(`Trying ReturnYoutubeDislikeAPI: ${apiUrl}`);
-            const response = await fetch(apiUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log('ReturnYoutubeDislikeAPI response:', data);
-
-                // This API might have duration info or we can use it for other features
-                // For now just log
-            }
-        } catch (error) {
-            console.log('ReturnYoutubeDislikeAPI failed:', error);
-        }
-
-        console.log('Duration fetch completed, no reliable source found');
-    }
-
-    updateDurationForVideo(videoId, duration) {
-        // Find the item with this videoId and update it
-        const itemIndex = this.items.findIndex(item => item.videoId === videoId);
-        if (itemIndex !== -1) {
-            console.log(`Updating duration for video ${videoId}: ${duration}`);
-            this.items[itemIndex].duration = duration;
-            this.saveItems();
-            this.renderItems();
-            console.log('Items re-rendered with duration');
-        } else {
-            console.log(`Video ${videoId} not found in items`);
-        }
-    }
-
-    formatDuration(seconds) {
-        if (!seconds) return '';
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-
-        if (hours > 0) {
-            return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-        }
-        return `${minutes}:${String(secs).padStart(2, '0')}`;
     }
 
     async getSpotifyData(url) {
@@ -697,7 +613,6 @@ class RankingManager {
         `;
 
         const expandedClass = isPlayingVideo ? 'youtube-expanded' : '';
-        const durationDisplay = item.duration ? `<div class="song-duration">⏱️ ${this.escapeHtml(item.duration)}</div>` : '';
         return `
             <div class="song-item ${rankColor} ${expandedClass}" data-item-index="${index}" draggable="true">
                 <div class="rank-controls">
@@ -711,7 +626,6 @@ class RankingManager {
                         ${this.escapeHtml(displayText)}
                         ${externalButton}
                     </div>
-                    ${durationDisplay}
                     <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}">
                 </div>
                 <button class="remove-btn" data-index="${index}">×</button>
