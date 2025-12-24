@@ -90,38 +90,8 @@ class RankingManager {
             console.log('Could not fetch YouTube title via oEmbed, using default');
         }
 
-        // Try to fetch duration using YouTube Noembed API (no API key required)
-        try {
-            const noembed_url = `https://noembed.com/embed?url=${encodeURIComponent(url)}`;
-            const response = await fetch(noembed_url);
-            if (response.ok) {
-                const data = await response.json();
-                if (data.duration) {
-                    duration = this.formatDuration(data.duration);
-                }
-            }
-        } catch (error) {
-            console.log('Noembed failed, trying alternative method');
-        }
-
-        // If Noembed didn't work, try fetching from YouTube's initial data using CORS proxy
-        if (!duration) {
-            try {
-                const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
-                const response = await fetch(proxyUrl);
-                if (response.ok) {
-                    const html = await response.text();
-                    // Look for duration in the initial data JSON
-                    const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
-                    if (durationMatch && durationMatch[1]) {
-                        duration = this.formatDuration(parseInt(durationMatch[1]));
-                    }
-                }
-            } catch (error) {
-                console.log('Could not fetch duration from YouTube, continuing without it');
-            }
-        }
+        // Fetch duration in background (non-blocking)
+        this.fetchYouTubeDurationAsync(videoId, url);
 
         return {
             platform: 'YouTube',
@@ -132,6 +102,63 @@ class RankingManager {
             videoId: videoId,
             duration: duration,
         };
+    }
+
+    async fetchYouTubeDurationAsync(videoId, url) {
+        let duration = '';
+
+        // Try Noembed API first with timeout
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const noembed_url = `https://noembed.com/embed?url=${encodeURIComponent(url)}`;
+            const response = await fetch(noembed_url, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.duration) {
+                    duration = this.formatDuration(data.duration);
+                    this.updateDurationForVideo(videoId, duration);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.log('Noembed API failed');
+        }
+
+        // If Noembed didn't work, try fetching from YouTube with timeout
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
+            const response = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+                const html = await response.text();
+                const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
+                if (durationMatch && durationMatch[1]) {
+                    duration = this.formatDuration(parseInt(durationMatch[1]));
+                    this.updateDurationForVideo(videoId, duration);
+                }
+            }
+        } catch (error) {
+            console.log('Could not fetch duration from YouTube');
+        }
+    }
+
+    updateDurationForVideo(videoId, duration) {
+        // Find the item with this videoId and update it
+        const itemIndex = this.items.findIndex(item => item.videoId === videoId);
+        if (itemIndex !== -1) {
+            this.items[itemIndex].duration = duration;
+            this.saveItems();
+            this.renderItems();
+        }
     }
 
     formatDuration(seconds) {
