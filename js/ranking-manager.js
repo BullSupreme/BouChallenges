@@ -101,7 +101,26 @@ class RankingManager {
                 }
             }
         } catch (error) {
-            console.log('Could not fetch duration, continuing without it');
+            console.log('Noembed failed, trying alternative method');
+        }
+
+        // If Noembed didn't work, try fetching from YouTube's initial data using CORS proxy
+        if (!duration) {
+            try {
+                const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(youtubeUrl)}`;
+                const response = await fetch(proxyUrl);
+                if (response.ok) {
+                    const html = await response.text();
+                    // Look for duration in the initial data JSON
+                    const durationMatch = html.match(/"lengthSeconds":"(\d+)"/);
+                    if (durationMatch && durationMatch[1]) {
+                        duration = this.formatDuration(parseInt(durationMatch[1]));
+                    }
+                }
+            } catch (error) {
+                console.log('Could not fetch duration from YouTube, continuing without it');
+            }
         }
 
         return {
