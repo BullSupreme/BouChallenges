@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Best Christmas Movies - Bou Challenges</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1a1f35 100%);
+            color: #f1f5f9;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .songs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .song-item {
+            display: grid;
+            grid-template-columns: 60px 120px 1fr;
+            gap: 20px;
+            align-items: center;
+            background: linear-gradient(135deg, #1e293b 0%, #253549 100%);
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .song-item:hover {
+            background: linear-gradient(135deg, #2d3f4f 0%, #3a4a5a 100%);
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+            transform: translateY(-2px);
+        }
+        .song-item-spotify {
+            grid-template-columns: 60px 1fr;
+        }
+        .spotify-embed-wrapper {
+            width: 100%;
+        }
+        .song-rank {
+            font-size: 1.8em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        .rank-gold .song-rank {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-silver .song-rank {
+            background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .rank-bronze .song-rank {
+            background: linear-gradient(135deg, #cd7f32 0%, #e5a76f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .song-thumbnail {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 5px;
+            object-fit: cover;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        .song-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .song-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 4px;
+        }
+        .song-artist {
+            font-size: 0.9em;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+        .song-platform {
+            font-size: 0.85em;
+            color: #a855f7;
+            font-weight: 500;
+        }
+        .song-platform a {
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+        .song-platform a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            color: #cbd5e1;
+            border-top: 2px solid #334155;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Top Best Christmas Movies</h1>
+        <div class="songs-list">
+            
+            <div class="song-item rank-gold" onclick="window.open('https://www.youtube.com/watch?v=dzdpqRGA1qc', '_blank');">
+                <div class="song-rank">#1</div>
+                <img src="https://img.youtube.com/vi/dzdpqRGA1qc/hqdefault.jpg" alt="Home Alone Official Trailer" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Home Alone Official Trailer</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=dzdpqRGA1qc" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=dzdpqRGA1qc</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-silver" onclick="window.open('https://www.youtube.com/watch?v=5h9VDUNtoto', '_blank');">
+                <div class="song-rank">#2</div>
+                <img src="https://img.youtube.com/vi/5h9VDUNtoto/hqdefault.jpg" alt="Home Alone 2: Lost in New York (1992) Trailer #1 | Movieclips Classic Trailers" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Home Alone 2: Lost in New York (1992) Trailer #1 | Movieclips Classic Trailers</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=5h9VDUNtoto" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=5h9VDUNtoto</a></div>
+                </div>
+            </div>
+            <div class="song-item rank-bronze" onclick="window.open('https://www.youtube.com/watch?v=Bx8FX7etF_8', '_blank');">
+                <div class="song-rank">#3</div>
+                <img src="https://img.youtube.com/vi/Bx8FX7etF_8/hqdefault.jpg" alt="The Santa Clause (1994) Trailer #1 | Movieclips Classic Trailers" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">The Santa Clause (1994) Trailer #1 | Movieclips Classic Trailers</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=Bx8FX7etF_8" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=Bx8FX7etF_8</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=EH3zcuRQXNo', '_blank');">
+                <div class="song-rank">#4</div>
+                <img src="https://img.youtube.com/vi/EH3zcuRQXNo/hqdefault.jpg" alt="CAROL - Official Trailer - Starring Cate Blanchett And Rooney Mara" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">CAROL - Official Trailer - Starring Cate Blanchett And Rooney Mara</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=EH3zcuRQXNo" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=EH3zcuRQXNo</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=DD0m9t4WHEQ', '_blank');">
+                <div class="song-rank">#5</div>
+                <img src="https://img.youtube.com/vi/DD0m9t4WHEQ/hqdefault.jpg" alt="How the Grinch Stole Christmas Official Trailer #1 - Clint Howard Movie (2000) HD" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">How the Grinch Stole Christmas Official Trailer #1 - Clint Howard Movie (2000) HD</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=DD0m9t4WHEQ" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=DD0m9t4WHEQ</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=kac5mo4mw38', '_blank');">
+                <div class="song-rank">#6</div>
+                <img src="https://img.youtube.com/vi/kac5mo4mw38/hqdefault.jpg" alt="Frosty The Snowman Trailer 1969" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Frosty The Snowman Trailer 1969</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=kac5mo4mw38" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=kac5mo4mw38</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=YaeDa_Uempk', '_blank');">
+                <div class="song-rank">#7</div>
+                <img src="https://img.youtube.com/vi/YaeDa_Uempk/hqdefault.jpg" alt="The Christmas Chronicles | Official Trailer | Netflix" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">The Christmas Chronicles | Official Trailer | Netflix</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=YaeDa_Uempk" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=YaeDa_Uempk</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=ZFoWiUqrhoE', '_blank');">
+                <div class="song-rank">#8</div>
+                <img src="https://img.youtube.com/vi/ZFoWiUqrhoE/hqdefault.jpg" alt="Jack Frost (1998) Official Trailer - Michael Keaton Family Snowman Drama Movie HD" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Jack Frost (1998) Official Trailer - Michael Keaton Family Snowman Drama Movie HD</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=ZFoWiUqrhoE" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=ZFoWiUqrhoE</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=gd20j2Hb-0Y', '_blank');">
+                <div class="song-rank">#9</div>
+                <img src="https://img.youtube.com/vi/gd20j2Hb-0Y/hqdefault.jpg" alt="Gremlins | Trailer | Warner Bros. Entertainment" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">Gremlins | Trailer | Warner Bros. Entertainment</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=gd20j2Hb-0Y" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=gd20j2Hb-0Y</a></div>
+                </div>
+            </div>
+            <div class="song-item " onclick="window.open('https://www.youtube.com/watch?v=wr6N_hZyBCk', '_blank');">
+                <div class="song-rank">#10</div>
+                <img src="https://img.youtube.com/vi/wr6N_hZyBCk/hqdefault.jpg" alt="The Nightmare Before Christmas (1993) Official Trailer #1 - Animated Movie" class="song-thumbnail">
+                <div class="song-info">
+                    <div class="song-title">The Nightmare Before Christmas (1993) Official Trailer #1 - Animated Movie</div>
+                    <div class="song-artist"></div>
+                    <div class="song-platform"><a href="https://www.youtube.com/watch?v=wr6N_hZyBCk" target="_blank" style="color: #a855f7; text-decoration: none; font-weight: 500;">https://www.youtube.com/watch?v=wr6N_hZyBCk</a></div>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p>Created by a Bou for a Bou | Made with ❤️</p>
+        </footer>
+    </div>
+</body>
+</html>
