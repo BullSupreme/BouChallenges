@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Movies - Bou Challenges</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 10px;">
+                <a href="../index.html" class="back-button">← Back Home</a>
+                <div style="display: flex; gap: 8px;">
+                    <a href="top-movies.html" class="btn btn-primary" style="font-size: 0.85em; padding: 8px 16px; background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);">Top Movies</a>
+                    <a href="top-movie-songs.html" class="btn btn-primary" style="font-size: 0.85em; padding: 8px 16px; background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);">Top Movie Songs</a>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="importBtn" class="btn btn-primary">Import HTML</button>
+                    <button id="exportBtn" class="btn btn-primary">Export as HTML</button>
+                </div>
+            </div>
+            <input type="file" id="importFileInput" accept=".html" style="display: none;">
+        </header>
+
+        <main>
+            <section class="challenge-section">
+                <div class="songs-list">
+                    <h2>Top Movies</h2>
+                    <p style="text-align: center; color: var(--text-dark); margin-bottom: 20px;">Minimum 10 ranks</p>
+                    <div id="songsList" class="songs-container">
+                        <!-- Rankings will be generated here -->
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button id="addRankBtn" class="btn btn-primary">+ Add Rank</button>
+                        <button id="removeRankBtn" class="btn btn-remove">- Remove Rank</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>Created by a Bou for a Bou | Made with ❤️</p>
+        </footer>
+    </div>
+
+    <script src="../js/ranking-manager.js"></script>
+    <script>
+        class TopMoviesManager extends RankingManager {
+            constructor() {
+                super('topMovies', 'movies');
+            }
+
+            initializeDefaults() {
+                const slots = [];
+                for (let i = 1; i <= 10; i++) {
+                    slots.push({ rank: i, title: '', artist: '', platform: '', thumbnailUrl: '' });
+                }
+                return slots;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new TopMoviesManager();
+        });
+    </script>
+</body>
+</html>
