@@ -27,7 +27,7 @@
             <section class="challenge-section">
                 <div class="songs-list">
                     <h2>Top Video Games Music</h2>
-                    <p style="text-align: center; color: var(--text-dark); margin-bottom: 20px;">Minimum 10 ranks</p>
+                    <p style="text-align: center; color: var(--text-dark); margin-bottom: 20px;">Minimum 20 ranks</p>
                     <div id="songsList" class="songs-container">
                         <!-- Rankings will be generated here -->
                     </div>
@@ -53,7 +53,7 @@
 
             initializeDefaults() {
                 const slots = [];
-                for (let i = 1; i <= 10; i++) {
+                for (let i = 1; i <= 20; i++) {
                     slots.push({ rank: i, title: '', artist: '', platform: '', thumbnailUrl: '' });
                 }
                 return slots;
