@@ -80,25 +80,24 @@ class PlaylistsManager {
 
         // Define all available ranking categories
         const availableCategories = [
-            { id: 'animeOST', name: 'Anime OST/Theme', type: 'personal' },
-            { id: 'animeEnding', name: 'Anime Ending', type: 'personal' },
-            { id: 'animeOpening', name: 'Anime Opening', type: 'personal' },
-            { id: 'christmasMovies', name: 'Christmas Movies', type: 'personal' },
-            { id: 'disneySongs', name: 'Disney Songs', type: 'personal' },
-            { id: 'topMovies', name: 'Top Movies', type: 'personal' },
-            { id: 'topMovieSongs', name: 'Top Movie Songs', type: 'personal' },
-            { id: 'topVideoGames', name: 'Top Video Games', type: 'personal' },
-            { id: 'topVideoGamesMusic', name: 'Top Video Games Music', type: 'personal' }
+            { id: 'animeOST', name: 'Anime OST/Theme' },
+            { id: 'animeEnding', name: 'Anime Ending' },
+            { id: 'animeOpening', name: 'Anime Opening' },
+            { id: 'christmasMovies', name: 'Christmas Movies' },
+            { id: 'disneySongs', name: 'Disney Songs' },
+            { id: 'topMovies', name: 'Top Movies' },
+            { id: 'topMovieSongs', name: 'Top Movie Songs' },
+            { id: 'topVideoGames', name: 'Top Video Games' },
+            { id: 'topVideoGamesMusic', name: 'Top Video Games Music' }
         ];
 
         container.innerHTML = availableCategories.map(category => {
-            const isSelected = this.selectedRankings.some(r => r.id === category.id && r.type === category.type);
+            const isSelected = this.selectedRankings.some(r => r.id === category.id);
             return `
-                <div class="ranking-card" style="padding: 15px; background: ${isSelected ? '#334155' : '#0f172a'}; border: 2px solid ${isSelected ? '#10b981' : '#334155'}; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;" data-id="${category.id}" data-type="${category.type}">
+                <div class="ranking-card" style="padding: 15px; background: ${isSelected ? '#334155' : '#0f172a'}; border: 2px solid ${isSelected ? '#10b981' : '#334155'}; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;" data-id="${category.id}">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h4 style="color: #f1f5f9; margin: 0 0 5px 0; font-size: 0.95em;">${category.name}</h4>
-                            <p style="color: #94a3b8; margin: 0; font-size: 0.85em;">${category.type === 'personal' ? 'Your Rankings' : 'Community'}</p>
+                            <h4 style="color: #f1f5f9; margin: 0; font-size: 0.95em;">${category.name}</h4>
                         </div>
                         <div style="font-size: 1.5em;">${isSelected ? '✓' : '+'}</div>
                     </div>
@@ -110,24 +109,23 @@ class PlaylistsManager {
         container.querySelectorAll('.ranking-card').forEach(card => {
             card.addEventListener('click', () => {
                 const id = card.dataset.id;
-                const type = card.dataset.type;
                 const h4 = card.querySelector('h4');
                 if (h4) {
-                    this.toggleRanking(id, type, h4.textContent);
+                    this.toggleRanking(id, h4.textContent);
                 }
             });
         });
     }
 
-    toggleRanking(id, type, name) {
-        const index = this.selectedRankings.findIndex(r => r.id === id && r.type === type);
+    toggleRanking(id, name) {
+        const index = this.selectedRankings.findIndex(r => r.id === id);
 
         if (index > -1) {
             // Remove from selection
             this.selectedRankings.splice(index, 1);
         } else {
             // Add to selection
-            this.selectedRankings.push({ id, type, name });
+            this.selectedRankings.push({ id, name });
         }
 
         this.renderAvailableRankings();
@@ -280,7 +278,10 @@ class PlaylistsManager {
 
         const url = rankingUrls[rankingId];
         if (url) {
+            console.log('Navigating to:', url);
             window.location.href = url;
+        } else {
+            console.error('Unknown ranking ID:', rankingId);
         }
     }
 }
