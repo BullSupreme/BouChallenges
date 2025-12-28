@@ -1907,22 +1907,49 @@ class RankingManager {
     // Autoplay/Shuffle Feature
     setupAutoplayControls() {
         const autoplayContainer = document.getElementById('autoplayContainer');
+        const addRankBtn = document.getElementById('addRankBtn');
 
-        if (!autoplayContainer) return;
+        if (!autoplayContainer || !addRankBtn) return;
 
-        // Create buttons in the top autoplay container (including refresh durations)
+        // Create buttons in the top autoplay container
         autoplayContainer.innerHTML = `
             <button id="autoplayBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.9em; padding: 8px 14px;">▶ Autoplay</button>
             <button id="shuffleBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 0.9em; padding: 8px 14px;">🔀 Shuffle</button>
             <button id="subCategoryBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 0.9em; padding: 8px 14px;">📂 Sub Categories</button>
-            <button id="refreshDurationsBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.9em; padding: 8px 14px;">🔄 Refresh Durations</button>
         `;
+
+        // Create refresh durations button in bottom controls container
+        const controlsContainer = addRankBtn.parentElement;
+
+        // Update the container to use justify-content: space-between
+        controlsContainer.style.cssText = 'display: flex; gap: 10px; margin-top: 20px; justify-content: space-between; align-items: center;';
+
+        // Create left buttons container
+        const leftButtons = document.createElement('div');
+        leftButtons.style.cssText = 'display: flex; gap: 10px;';
+
+        // Move existing buttons to left container
+        const removeBtn = document.getElementById('removeRankBtn');
+        leftButtons.appendChild(addRankBtn);
+        leftButtons.appendChild(removeBtn);
+
+        // Create refresh button
+        const refreshBtn = document.createElement('button');
+        refreshBtn.id = 'refreshDurationsBtn';
+        refreshBtn.className = 'btn btn-primary';
+        refreshBtn.style.cssText = 'background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.9em;';
+        refreshBtn.textContent = '🔄 Refresh Durations';
+
+        // Clear container and add organized structure
+        controlsContainer.innerHTML = '';
+        controlsContainer.appendChild(leftButtons);
+        controlsContainer.appendChild(refreshBtn);
 
         // Setup event listeners
         document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
         document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
         document.getElementById('subCategoryBtn').addEventListener('click', () => this.toggleSubCategoryAutoplay());
-        document.getElementById('refreshDurationsBtn').addEventListener('click', () => this.refreshAllDurations());
+        refreshBtn.addEventListener('click', () => this.refreshAllDurations());
     }
 
     async refreshAllDurations() {
@@ -2117,6 +2144,7 @@ class RankingManager {
 
         // Find next item
         let nextIndex;
+        let shouldNavigateToSubCategory = false;
 
         if (this.shuffleEnabled) {
             // Shuffle mode: pick random unplayed item
@@ -2127,8 +2155,7 @@ class RankingManager {
             if (youtubeItems.length === 0) {
                 // All played in current category
                 if (this.subCategoryAutoplayEnabled) {
-                    this.navigateToNextSubCategory();
-                    return;
+                    shouldNavigateToSubCategory = true;
                 } else {
                     // Reset and loop current category
                     this.playedIndices = [];
@@ -2153,8 +2180,7 @@ class RankingManager {
             // Reached end of current category
             if (nextIndex >= this.items.length) {
                 if (this.subCategoryAutoplayEnabled) {
-                    this.navigateToNextSubCategory();
-                    return;
+                    shouldNavigateToSubCategory = true;
                 } else {
                     // Loop back to start of current category
                     nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
@@ -2162,9 +2188,30 @@ class RankingManager {
             }
         }
 
-        if (nextIndex !== -1) {
-            this.playNextItem(nextIndex);
+        if (shouldNavigateToSubCategory) {
+            this.navigateToNextSubCategory();
+        } else if (nextIndex !== -1) {
+            // Save state and refresh to play next item
+            this.saveAndRefreshForNextVideo(nextIndex);
         }
+    }
+
+    saveAndRefreshForNextVideo(nextIndex) {
+        // Update played indices
+        this.playedIndices.push(nextIndex);
+
+        // Save state to localStorage
+        localStorage.setItem('autoplayState', JSON.stringify({
+            autoplayEnabled: true,
+            shuffleEnabled: this.shuffleEnabled,
+            subCategoryAutoplayEnabled: this.subCategoryAutoplayEnabled,
+            nextVideoIndex: nextIndex,
+            playedIndices: this.playedIndices,
+            storageKey: this.storageKey
+        }));
+
+        // Refresh page to play next video
+        window.location.reload();
     }
 
     getSubCategoryNavigation() {
@@ -2190,20 +2237,41 @@ class RankingManager {
             this.playedIndices = [];
             const nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
             if (nextIndex !== -1) {
-                this.playNextItem(nextIndex);
+                this.saveAndRefreshForNextVideo(nextIndex);
             }
             return;
         }
 
-        // Save autoplay state to localStorage
+        // Determine the next category's storageKey
+        const nextStorageKey = this.getStorageKeyFromUrl(navInfo.next);
+
+        // Save autoplay state to localStorage for sub-category navigation
         localStorage.setItem('autoplayState', JSON.stringify({
             autoplayEnabled: true,
             shuffleEnabled: this.shuffleEnabled,
-            subCategoryAutoplayEnabled: true
+            subCategoryAutoplayEnabled: true,
+            playedIndices: [], // Reset played indices for new category
+            storageKey: nextStorageKey,
+            nextVideoIndex: this.shuffleEnabled ? undefined : 0 // Start from first or random
         }));
 
         // Navigate to next sub-category
         window.location.href = navInfo.next;
+    }
+
+    getStorageKeyFromUrl(url) {
+        // Map URLs to storage keys
+        const urlToStorageKey = {
+            'pages/anime-ost.html': 'animeOST',
+            'pages/anime-ending.html': 'animeEnding',
+            'pages/anime-opening.html': 'animeOpening',
+            'pages/top-movies.html': 'topMovies',
+            'pages/top-movie-songs.html': 'topMovieSongs',
+            'pages/top-videogames.html': 'topVideoGames',
+            'pages/top-videogames-music.html': 'topVideoGamesMusic'
+        };
+
+        return urlToStorageKey[url] || null;
     }
 
     restoreAutoplayState() {
@@ -2211,36 +2279,75 @@ class RankingManager {
         if (savedState) {
             try {
                 const state = JSON.parse(savedState);
+
+                // Only restore if this is the same category
+                if (state.storageKey && state.storageKey !== this.storageKey) {
+                    // Different category, don't restore
+                    return;
+                }
+
                 localStorage.removeItem('autoplayState'); // Clear after reading
 
                 if (state.autoplayEnabled) {
                     // Restore autoplay settings
-                    this.shuffleEnabled = state.shuffleEnabled;
-                    this.subCategoryAutoplayEnabled = state.subCategoryAutoplayEnabled;
+                    this.shuffleEnabled = state.shuffleEnabled || false;
+                    this.subCategoryAutoplayEnabled = state.subCategoryAutoplayEnabled || false;
+                    this.playedIndices = state.playedIndices || [];
 
                     // Update button states
-                    if (this.shuffleEnabled) {
-                        const shuffleBtn = document.getElementById('shuffleBtn');
-                        if (shuffleBtn) {
-                            shuffleBtn.style.background = 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
-                            shuffleBtn.style.boxShadow = '0 4px 12px rgba(168, 85, 247, 0.4)';
-                            shuffleBtn.textContent = '🔀 Shuffle ON';
-                        }
-                    }
-
-                    if (this.subCategoryAutoplayEnabled) {
-                        const subCategoryBtn = document.getElementById('subCategoryBtn');
-                        if (subCategoryBtn) {
-                            subCategoryBtn.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)';
-                            subCategoryBtn.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.4)';
-                            subCategoryBtn.textContent = '📂 Sub Categories ON';
-                        }
-                    }
-
-                    // Start autoplay after a short delay
                     setTimeout(() => {
-                        this.toggleAutoplay();
-                    }, 500);
+                        if (this.shuffleEnabled) {
+                            const shuffleBtn = document.getElementById('shuffleBtn');
+                            if (shuffleBtn) {
+                                shuffleBtn.style.background = 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
+                                shuffleBtn.style.boxShadow = '0 4px 12px rgba(168, 85, 247, 0.4)';
+                                shuffleBtn.textContent = '🔀 Shuffle ON';
+                            }
+                        }
+
+                        if (this.subCategoryAutoplayEnabled) {
+                            const subCategoryBtn = document.getElementById('subCategoryBtn');
+                            if (subCategoryBtn) {
+                                subCategoryBtn.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)';
+                                subCategoryBtn.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.4)';
+                                subCategoryBtn.textContent = '📂 Sub Categories ON';
+                            }
+                        }
+
+                        // Enable autoplay
+                        this.autoplayEnabled = true;
+                        const autoplayBtn = document.getElementById('autoplayBtn');
+                        if (autoplayBtn) {
+                            autoplayBtn.textContent = '⏸ Stop';
+                            autoplayBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+                        }
+
+                        // Determine which video to play
+                        let videoIndex = state.nextVideoIndex;
+
+                        // If shuffle mode and no specific index, pick random
+                        if (this.shuffleEnabled && videoIndex === undefined) {
+                            const youtubeItems = this.items
+                                .map((item, idx) => ({ item, idx }))
+                                .filter(({ item }) => item.url && item.platform === 'YouTube');
+
+                            if (youtubeItems.length > 0) {
+                                const randomItem = youtubeItems[Math.floor(Math.random() * youtubeItems.length)];
+                                videoIndex = randomItem.idx;
+                            }
+                        }
+
+                        // Play the video
+                        if (videoIndex !== undefined && videoIndex !== null) {
+                            this.playNextItem(videoIndex);
+                        } else {
+                            // Fallback: find first YouTube video
+                            const firstYoutubeIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+                            if (firstYoutubeIndex !== -1) {
+                                this.playNextItem(firstYoutubeIndex);
+                            }
+                        }
+                    }, 300);
                 }
             } catch (error) {
                 console.log('Could not restore autoplay state:', error);
