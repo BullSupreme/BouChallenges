@@ -256,34 +256,10 @@ class PlaylistsManager {
             playedIndices: []
         }));
 
-        // Navigate to the first ranking in the playlist
-        if (playlist.rankings.length > 0) {
-            const firstRanking = playlist.rankings[0];
-            this.navigateToRanking(firstRanking.id);
-        }
+        // Navigate to the playlist viewer page
+        window.location.href = 'playlist-viewer.html';
     }
 
-    navigateToRanking(rankingId) {
-        const rankingUrls = {
-            'animeOST': 'anime-ost.html',
-            'animeEnding': 'anime-ending.html',
-            'animeOpening': 'anime-opening.html',
-            'christmasMovies': 'christmas-movies.html',
-            'disneySongs': 'disney-songs.html',
-            'topMovies': 'top-movies.html',
-            'topMovieSongs': 'top-movie-songs.html',
-            'topVideoGames': 'top-videogames.html',
-            'topVideoGamesMusic': 'top-videogames-music.html'
-        };
-
-        const url = rankingUrls[rankingId];
-        if (url) {
-            console.log('Navigating to:', url);
-            window.location.href = url;
-        } else {
-            console.error('Unknown ranking ID:', rankingId);
-        }
-    }
 }
 
 // Initialize playlists manager
