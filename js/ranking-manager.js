@@ -2001,20 +2001,28 @@ class RankingManager {
 
     startCountdown(index, totalSeconds) {
         let remainingSeconds = totalSeconds;
+        let startTime = performance.now();
+        let lastUpdate = startTime;
 
         // Update duration display immediately
         this.updateDurationDisplay(index, remainingSeconds);
 
-        this.countdownInterval = setInterval(() => {
-            remainingSeconds--;
+        const updateCountdown = () => {
+            const now = performance.now();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            remainingSeconds = totalSeconds - elapsed;
 
-            if (remainingSeconds <= 0) {
+            // Always update display first
+            this.updateDurationDisplay(index, Math.max(0, remainingSeconds));
+
+            // Then check if time is up
+            if (remainingSeconds < 0) {
                 clearInterval(this.countdownInterval);
                 this.onVideoEnd();
-            } else {
-                this.updateDurationDisplay(index, remainingSeconds);
             }
-        }, 1000);
+        };
+
+        this.countdownInterval = setInterval(updateCountdown, 100); // Check every 100ms for accuracy
     }
 
     updateDurationDisplay(index, seconds) {
