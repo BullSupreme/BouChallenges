@@ -17,6 +17,12 @@ class RankingManager {
         this.itemsList = document.getElementById('songsList');
         // Make instance globally available for onclick handlers
         window.rankingManager = this;
+        // Autoplay properties
+        this.autoplayEnabled = false;
+        this.shuffleEnabled = false;
+        this.currentPlayingIndex = null;
+        this.countdownInterval = null;
+        this.playedIndices = [];
         this.init();
     }
 
@@ -40,6 +46,8 @@ class RankingManager {
         if (this.itemsList && this.itemsList.closest('.songs-list')) {
             this.setupCommunityBrowser();
         }
+        // Setup autoplay controls
+        this.setupAutoplayControls();
     }
 
     // Parse URL and extract metadata (YouTube/Spotify specific)
@@ -703,7 +711,7 @@ class RankingManager {
         `;
 
         const expandedClass = isPlayingVideo ? 'youtube-expanded' : '';
-        const durationDisplay = item.duration ? `<div class="song-duration">⏱️ ${this.escapeHtml(item.duration)}</div>` : '';
+        const durationDisplay = item.duration ? `<div class="song-duration" data-index="${index}" data-duration="${item.duration}">⏱️ ${this.escapeHtml(item.duration)}</div>` : '';
         return `
             <div class="song-item ${rankColor} ${expandedClass}" data-item-index="${index}" draggable="true">
                 <div class="rank-controls">
@@ -717,9 +725,9 @@ class RankingManager {
                         ${this.escapeHtml(displayText)}
                         ${externalButton}
                     </div>
-                    ${durationDisplay}
                     <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}">
                 </div>
+                ${durationDisplay}
                 <button class="remove-btn" data-index="${index}">×</button>
             </div>
         `;
@@ -1868,5 +1876,178 @@ class RankingManager {
                 modal.remove();
             }
         });
+    }
+
+    // Autoplay/Shuffle Feature
+    setupAutoplayControls() {
+        const addRankBtn = document.getElementById('addRankBtn');
+        if (!addRankBtn) return;
+
+        const controlsContainer = addRankBtn.parentElement;
+
+        // Create autoplay controls
+        const autoplayControls = document.createElement('div');
+        autoplayControls.style.cssText = 'display: flex; gap: 10px; align-items: center;';
+        autoplayControls.innerHTML = `
+            <button id="autoplayBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">▶ Autoplay</button>
+            <button id="shuffleBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">🔀 Shuffle</button>
+        `;
+
+        controlsContainer.appendChild(autoplayControls);
+
+        // Setup event listeners
+        document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
+        document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
+    }
+
+    toggleAutoplay() {
+        this.autoplayEnabled = !this.autoplayEnabled;
+        const btn = document.getElementById('autoplayBtn');
+
+        if (this.autoplayEnabled) {
+            btn.textContent = '⏸ Stop';
+            btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+            this.startAutoplay();
+        } else {
+            btn.textContent = '▶ Autoplay';
+            btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            this.stopAutoplay();
+        }
+    }
+
+    toggleShuffle() {
+        this.shuffleEnabled = !this.shuffleEnabled;
+        const btn = document.getElementById('shuffleBtn');
+
+        if (this.shuffleEnabled) {
+            btn.style.background = 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
+            btn.style.boxShadow = '0 4px 12px rgba(168, 85, 247, 0.4)';
+        } else {
+            btn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100())';
+            btn.style.boxShadow = 'none';
+        }
+    }
+
+    startAutoplay() {
+        // Find first item with URL or start from beginning
+        let startIndex = 0;
+        for (let i = 0; i < this.items.length; i++) {
+            if (this.items[i].url && this.items[i].platform === 'YouTube') {
+                startIndex = i;
+                break;
+            }
+        }
+
+        this.playedIndices = [];
+        this.playNextItem(startIndex);
+    }
+
+    stopAutoplay() {
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
+        this.currentPlayingIndex = null;
+    }
+
+    playNextItem(index) {
+        if (!this.autoplayEnabled) return;
+
+        // Play the item
+        this.playItem(index);
+        this.currentPlayingIndex = index;
+        this.playedIndices.push(index);
+
+        // Get duration (default to 90 seconds if not available)
+        const item = this.items[index];
+        let durationSeconds = 90; // Default 1:30
+
+        if (item.duration) {
+            durationSeconds = this.parseDurationToSeconds(item.duration);
+        }
+
+        // Start countdown
+        this.startCountdown(index, durationSeconds);
+    }
+
+    parseDurationToSeconds(duration) {
+        const parts = duration.split(':').map(p => parseInt(p));
+        if (parts.length === 3) {
+            // HH:MM:SS
+            return parts[0] * 3600 + parts[1] * 60 + parts[2];
+        } else if (parts.length === 2) {
+            // MM:SS
+            return parts[0] * 60 + parts[1];
+        }
+        return 90; // Default
+    }
+
+    startCountdown(index, totalSeconds) {
+        let remainingSeconds = totalSeconds;
+
+        // Update duration display immediately
+        this.updateDurationDisplay(index, remainingSeconds);
+
+        this.countdownInterval = setInterval(() => {
+            remainingSeconds--;
+
+            if (remainingSeconds <= 0) {
+                clearInterval(this.countdownInterval);
+                this.onVideoEnd();
+            } else {
+                this.updateDurationDisplay(index, remainingSeconds);
+            }
+        }, 1000);
+    }
+
+    updateDurationDisplay(index, seconds) {
+        const durationEl = document.querySelector(`.song-duration[data-index="${index}"]`);
+        if (durationEl) {
+            const formatted = this.formatDuration(seconds);
+            durationEl.textContent = `⏱️ ${formatted}`;
+        }
+    }
+
+    onVideoEnd() {
+        if (!this.autoplayEnabled) return;
+
+        // Find next item
+        let nextIndex;
+
+        if (this.shuffleEnabled) {
+            // Shuffle mode: pick random unplayed item
+            const youtubeItems = this.items
+                .map((item, idx) => ({ item, idx }))
+                .filter(({ item, idx }) => item.url && item.platform === 'YouTube' && !this.playedIndices.includes(idx));
+
+            if (youtubeItems.length === 0) {
+                // All played, reset
+                this.playedIndices = [];
+                nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+            } else {
+                const randomItem = youtubeItems[Math.floor(Math.random() * youtubeItems.length)];
+                nextIndex = randomItem.idx;
+            }
+        } else {
+            // Normal mode: play next in order
+            nextIndex = this.currentPlayingIndex + 1;
+
+            // Find next YouTube item
+            while (nextIndex < this.items.length) {
+                if (this.items[nextIndex].url && this.items[nextIndex].platform === 'YouTube') {
+                    break;
+                }
+                nextIndex++;
+            }
+
+            // Loop back to start if reached end
+            if (nextIndex >= this.items.length) {
+                nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+            }
+        }
+
+        if (nextIndex !== -1) {
+            this.playNextItem(nextIndex);
+        }
     }
 }

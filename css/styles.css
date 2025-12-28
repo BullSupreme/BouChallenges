@@ -617,10 +617,16 @@ main {
 }
 
 .song-duration {
+    position: absolute;
+    top: 10px;
+    right: 50px;
     font-size: 0.85em;
     color: var(--accent-color);
-    margin: 5px 0;
     font-weight: 500;
+    background: rgba(30, 41, 59, 0.9);
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 10;
 }
 
 .song-actions {
