@@ -1911,11 +1911,12 @@ class RankingManager {
 
         if (!autoplayContainer || !addRankBtn) return;
 
-        // Create buttons in the top autoplay container
+        // Create buttons in the top autoplay container (emoji-only with tooltips)
         autoplayContainer.innerHTML = `
-            <button id="autoplayBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.9em; padding: 8px 14px;">▶ Autoplay</button>
-            <button id="shuffleBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 0.9em; padding: 8px 14px;">🔀 Shuffle</button>
-            <button id="subCategoryBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 0.9em; padding: 8px 14px;">📂 Sub Categories</button>
+            <button id="nextBtn" class="btn btn-primary" title="Next Video" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">⏭️</button>
+            <button id="autoplayBtn" class="btn btn-primary" title="Autoplay" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">▶️</button>
+            <button id="shuffleBtn" class="btn btn-primary" title="Shuffle" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">🔀</button>
+            <button id="subCategoryBtn" class="btn btn-primary" title="Sub Categories" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">📂</button>
         `;
 
         // Create refresh durations button in bottom controls container
@@ -1946,10 +1947,20 @@ class RankingManager {
         controlsContainer.appendChild(refreshBtn);
 
         // Setup event listeners
+        document.getElementById('nextBtn').addEventListener('click', () => this.skipToNext());
         document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
         document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
         document.getElementById('subCategoryBtn').addEventListener('click', () => this.toggleSubCategoryAutoplay());
         refreshBtn.addEventListener('click', () => this.refreshAllDurations());
+    }
+
+    skipToNext() {
+        // Manually skip to next video
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
+        this.onVideoEnd();
     }
 
     async refreshAllDurations() {
@@ -1996,7 +2007,8 @@ class RankingManager {
         const btn = document.getElementById('autoplayBtn');
 
         if (this.autoplayEnabled) {
-            btn.textContent = '⏸ Stop';
+            btn.textContent = '⏸️';
+            btn.title = 'Stop';
             btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
             this.startAutoplay();
         } else {
@@ -2013,11 +2025,11 @@ class RankingManager {
         if (this.shuffleEnabled) {
             btn.style.background = 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
             btn.style.boxShadow = '0 4px 12px rgba(168, 85, 247, 0.4)';
-            btn.textContent = '🔀 Shuffle ON';
+            btn.title = 'Shuffle ON';
         } else {
             btn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
             btn.style.boxShadow = 'none';
-            btn.textContent = '🔀 Shuffle';
+            btn.title = 'Shuffle';
         }
     }
 
@@ -2028,11 +2040,11 @@ class RankingManager {
         if (this.subCategoryAutoplayEnabled) {
             btn.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)';
             btn.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.4)';
-            btn.textContent = '📂 Sub Categories ON';
+            btn.title = 'Sub Categories ON';
         } else {
             btn.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
             btn.style.boxShadow = 'none';
-            btn.textContent = '📂 Sub Categories';
+            btn.title = 'Sub Categories';
         }
     }
 
@@ -2301,7 +2313,7 @@ class RankingManager {
                             if (shuffleBtn) {
                                 shuffleBtn.style.background = 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
                                 shuffleBtn.style.boxShadow = '0 4px 12px rgba(168, 85, 247, 0.4)';
-                                shuffleBtn.textContent = '🔀 Shuffle ON';
+                                shuffleBtn.title = 'Shuffle ON';
                             }
                         }
 
@@ -2310,7 +2322,7 @@ class RankingManager {
                             if (subCategoryBtn) {
                                 subCategoryBtn.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)';
                                 subCategoryBtn.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.4)';
-                                subCategoryBtn.textContent = '📂 Sub Categories ON';
+                                subCategoryBtn.title = 'Sub Categories ON';
                             }
                         }
 
@@ -2318,7 +2330,8 @@ class RankingManager {
                         this.autoplayEnabled = true;
                         const autoplayBtn = document.getElementById('autoplayBtn');
                         if (autoplayBtn) {
-                            autoplayBtn.textContent = '⏸ Stop';
+                            autoplayBtn.textContent = '⏸️';
+                            autoplayBtn.title = 'Stop';
                             autoplayBtn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
                         }
 
