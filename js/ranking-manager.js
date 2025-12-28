@@ -1922,9 +1922,11 @@ class RankingManager {
         if (this.shuffleEnabled) {
             btn.style.background = 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
             btn.style.boxShadow = '0 4px 12px rgba(168, 85, 247, 0.4)';
+            btn.textContent = '🔀 Shuffle ON';
         } else {
-            btn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100())';
+            btn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
             btn.style.boxShadow = 'none';
+            btn.textContent = '🔀 Shuffle';
         }
     }
 
