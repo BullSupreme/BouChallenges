@@ -82,34 +82,42 @@
                 let currentRank = 1;
 
                 this.playlist.rankings.forEach(ranking => {
-                    // Get data from localStorage for each ranking
-                    const storageKey = this.getRankingStorageKey(ranking.id);
-                    const rankingData = localStorage.getItem(storageKey);
+                    let items = [];
 
-                    if (rankingData) {
-                        try {
-                            const parsedData = JSON.parse(rankingData);
-                            const items = parsedData.songs || parsedData.movies || parsedData.games || [];
+                    // Check if this is an imported ranking or personal ranking
+                    if (ranking.type === 'imported' && ranking.data) {
+                        // Use the imported data directly
+                        items = ranking.data.items || [];
+                    } else {
+                        // Get data from localStorage for personal rankings
+                        const storageKey = this.getRankingStorageKey(ranking.id);
+                        const rankingData = localStorage.getItem(storageKey);
 
-                            // Add each item with its original title and source
-                            items.forEach(item => {
-                                if (item.title && item.title.trim()) {
-                                    mergedItems.push({
-                                        rank: currentRank++,
-                                        title: item.title,
-                                        artist: item.artist || '',
-                                        platform: item.platform || 'YouTube',
-                                        url: item.url || '',
-                                        thumbnailUrl: item.thumbnailUrl || '',
-                                        duration: item.duration || '',
-                                        source: ranking.name // Add source category
-                                    });
-                                }
-                            });
-                        } catch (e) {
-                            console.error(`Error loading ${ranking.name}:`, e);
+                        if (rankingData) {
+                            try {
+                                const parsedData = JSON.parse(rankingData);
+                                items = parsedData.songs || parsedData.movies || parsedData.games || [];
+                            } catch (e) {
+                                console.error(`Error loading ${ranking.name}:`, e);
+                            }
                         }
                     }
+
+                    // Add each item with its original title and source
+                    items.forEach(item => {
+                        if (item.title && item.title.trim()) {
+                            mergedItems.push({
+                                rank: currentRank++,
+                                title: item.title,
+                                artist: item.artist || '',
+                                platform: item.platform || 'YouTube',
+                                url: item.url || '',
+                                thumbnailUrl: item.thumbnailUrl || '',
+                                duration: item.duration || '',
+                                source: ranking.name // Add source category
+                            });
+                        }
+                    });
                 });
 
                 // Save merged items

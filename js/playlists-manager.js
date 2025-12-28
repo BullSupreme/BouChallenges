@@ -3,6 +3,7 @@ class PlaylistsManager {
         this.playlists = JSON.parse(localStorage.getItem('userPlaylists')) || [];
         this.currentEditingPlaylist = null;
         this.selectedRankings = [];
+        this.importedRankings = [];
 
         this.init();
     }
@@ -16,6 +17,40 @@ class PlaylistsManager {
         document.getElementById('createPlaylistBtn').addEventListener('click', () => this.openCreateModal());
         document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
         document.getElementById('savePlaylistBtn').addEventListener('click', () => this.savePlaylist());
+    }
+
+    setupModalEventListeners() {
+        // Tab switching
+        const personalTab = document.getElementById('personalTab');
+        const communityTab = document.getElementById('communityTab');
+        const personalSection = document.getElementById('personalRankingsSection');
+        const communitySection = document.getElementById('communityRankingsSection');
+
+        if (personalTab && communityTab) {
+            personalTab.addEventListener('click', () => {
+                personalSection.style.display = 'block';
+                communitySection.style.display = 'none';
+                personalTab.className = 'btn btn-primary';
+                personalTab.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                communityTab.className = 'btn btn-secondary';
+                communityTab.style.background = '';
+            });
+
+            communityTab.addEventListener('click', () => {
+                personalSection.style.display = 'none';
+                communitySection.style.display = 'block';
+                communityTab.className = 'btn btn-primary';
+                communityTab.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                personalTab.className = 'btn btn-secondary';
+                personalTab.style.background = '';
+            });
+        }
+
+        // File import handling
+        const importFile = document.getElementById('importRankingFile');
+        if (importFile) {
+            importFile.addEventListener('change', (e) => this.handleFileImport(e));
+        }
     }
 
     openCreateModal() {
@@ -33,9 +68,12 @@ class PlaylistsManager {
 
         modalTitle.textContent = 'Create Playlist';
         nameInput.value = '';
+        modal.style.display = 'flex';
+
+        // Setup event listeners after modal is displayed
+        this.setupModalEventListeners();
         this.renderAvailableRankings();
         this.updateSelectedRankings();
-        modal.style.display = 'flex';
     }
 
     openEditModal(playlistId) {
@@ -117,26 +155,148 @@ class PlaylistsManager {
         });
     }
 
-    toggleRanking(id, name) {
-        const index = this.selectedRankings.findIndex(r => r.id === id);
+    toggleRanking(id, name, type = 'personal', data = null) {
+        const index = this.selectedRankings.findIndex(r => r.id === id && r.type === type);
 
         if (index > -1) {
             // Remove from selection
             this.selectedRankings.splice(index, 1);
         } else {
             // Add to selection
-            this.selectedRankings.push({ id, name });
+            const ranking = { id, name, type };
+            if (type === 'imported' && data) {
+                ranking.data = data; // Store the imported ranking data
+            }
+            this.selectedRankings.push(ranking);
         }
 
         this.renderAvailableRankings();
+        this.renderImportedRankings();
         this.updateSelectedRankings();
+    }
+
+    handleFileImport(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+
+        Array.from(files).forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const htmlContent = e.target.result;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(htmlContent, 'text/html');
+
+                    // Extract ranking data from HTML
+                    const rankingData = this.parseRankingHTML(doc, file.name);
+                    if (rankingData) {
+                        // Add to imported rankings list
+                        if (!this.importedRankings) {
+                            this.importedRankings = [];
+                        }
+                        this.importedRankings.push(rankingData);
+                        this.renderImportedRankings();
+                    }
+                } catch (error) {
+                    console.error('Error parsing HTML file:', error);
+                    alert(`Error importing ${file.name}: ${error.message}`);
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    parseRankingHTML(doc, filename) {
+        // Extract username from the HTML
+        const usernameElement = doc.querySelector('.username');
+        const username = usernameElement ? usernameElement.textContent.trim() : 'Unknown';
+
+        // Extract title (ranking category)
+        const titleElement = doc.querySelector('h2');
+        const title = titleElement ? titleElement.textContent.trim() : filename.replace('.html', '');
+
+        // Extract all ranking items
+        const songItems = doc.querySelectorAll('.song-item');
+        const items = [];
+
+        songItems.forEach(item => {
+            const rank = item.querySelector('.rank-number')?.textContent.replace('#', '').trim();
+            const title = item.querySelector('.song-title')?.value || '';
+            const artist = item.querySelector('.song-artist')?.value || '';
+            const platform = item.querySelector('.platform-select')?.value || 'YouTube';
+            const url = item.querySelector('.url-input')?.value || '';
+            const thumbnailUrl = item.querySelector('.thumbnail-preview img')?.src || '';
+            const duration = item.querySelector('.song-duration')?.textContent || '';
+
+            if (title) {
+                items.push({
+                    rank: parseInt(rank) || items.length + 1,
+                    title,
+                    artist,
+                    platform,
+                    url,
+                    thumbnailUrl,
+                    duration
+                });
+            }
+        });
+
+        return {
+            id: `imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            name: `${username} - ${title}`,
+            username,
+            category: title,
+            items,
+            filename
+        };
+    }
+
+    renderImportedRankings() {
+        const container = document.getElementById('importedRankings');
+        if (!container || !this.importedRankings) return;
+
+        if (this.importedRankings.length === 0) {
+            container.innerHTML = '<p style="color: #64748b; text-align: center; grid-column: 1 / -1;">No imported rankings yet. Upload HTML files to add them.</p>';
+            return;
+        }
+
+        container.innerHTML = this.importedRankings.map(ranking => {
+            const isSelected = this.selectedRankings.some(r => r.id === ranking.id && r.type === 'imported');
+            return `
+                <div class="ranking-card" style="padding: 15px; background: ${isSelected ? '#334155' : '#0f172a'}; border: 2px solid ${isSelected ? '#10b981' : '#334155'}; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;" data-id="${ranking.id}" data-type="imported">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4 style="color: #f1f5f9; margin: 0 0 5px 0; font-size: 0.95em;">${ranking.category}</h4>
+                            <p style="color: #94a3b8; margin: 0; font-size: 0.85em;">By: ${ranking.username} (${ranking.items.length} items)</p>
+                        </div>
+                        <div style="font-size: 1.5em;">${isSelected ? '✓' : '+'}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click listeners
+        container.querySelectorAll('.ranking-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const id = card.dataset.id;
+                const ranking = this.importedRankings.find(r => r.id === id);
+                if (ranking) {
+                    this.toggleRanking(id, ranking.name, 'imported', ranking);
+                }
+            });
+        });
     }
 
     updateSelectedRankings() {
         const container = document.getElementById('selectedRankings');
         const countSpan = document.getElementById('selectedCount');
 
-        if (!container || !countSpan) return;
+        console.log('updateSelectedRankings called, selectedRankings:', this.selectedRankings);
+
+        if (!container || !countSpan) {
+            console.error('Container or countSpan not found');
+            return;
+        }
 
         countSpan.textContent = this.selectedRankings.length;
 
@@ -150,6 +310,7 @@ class PlaylistsManager {
                     <button onclick="playlistsManager.removeSelected(${index})" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.1em; padding: 0; line-height: 1;">×</button>
                 </div>
             `).join('');
+            console.log('Rendered selected rankings:', container.innerHTML);
         }
     }
 
