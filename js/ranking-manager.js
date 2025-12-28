@@ -1916,7 +1916,7 @@ class RankingManager {
             <button id="nextBtn" class="btn btn-primary" title="Next Video" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">⏭️</button>
             <button id="autoplayBtn" class="btn btn-primary" title="Autoplay" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">▶️</button>
             <button id="shuffleBtn" class="btn btn-primary" title="Shuffle" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">🔀</button>
-            <button id="subCategoryBtn" class="btn btn-primary" title="Sub Categories" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">📂</button>
+            <button id="playlistBtn" class="btn btn-primary" title="Playlists" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">📋</button>
         `;
 
         // Create refresh durations button in bottom controls container
@@ -1950,8 +1950,13 @@ class RankingManager {
         document.getElementById('nextBtn').addEventListener('click', () => this.skipToNext());
         document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
         document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
-        document.getElementById('subCategoryBtn').addEventListener('click', () => this.toggleSubCategoryAutoplay());
+        document.getElementById('playlistBtn').addEventListener('click', () => this.openPlaylists());
         refreshBtn.addEventListener('click', () => this.refreshAllDurations());
+    }
+
+    openPlaylists() {
+        // Navigate to playlists page
+        window.location.href = '../pages/playlists.html';
     }
 
     skipToNext() {
@@ -2154,9 +2159,12 @@ class RankingManager {
     onVideoEnd() {
         if (!this.autoplayEnabled) return;
 
+        // Check if we're playing from a playlist
+        const activePlaylist = this.getActivePlaylist();
+
         // Find next item
         let nextIndex;
-        let shouldNavigateToSubCategory = false;
+        let shouldNavigateToNextRanking = false;
 
         if (this.shuffleEnabled) {
             // Shuffle mode: pick random unplayed item
@@ -2166,8 +2174,8 @@ class RankingManager {
 
             if (youtubeItems.length === 0) {
                 // All played in current category
-                if (this.subCategoryAutoplayEnabled) {
-                    shouldNavigateToSubCategory = true;
+                if (activePlaylist) {
+                    shouldNavigateToNextRanking = true;
                 } else {
                     // Reset and loop current category
                     this.playedIndices = [];
@@ -2191,8 +2199,8 @@ class RankingManager {
 
             // Reached end of current category
             if (nextIndex >= this.items.length) {
-                if (this.subCategoryAutoplayEnabled) {
-                    shouldNavigateToSubCategory = true;
+                if (activePlaylist) {
+                    shouldNavigateToNextRanking = true;
                 } else {
                     // Loop back to start of current category
                     nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
@@ -2200,11 +2208,51 @@ class RankingManager {
             }
         }
 
-        if (shouldNavigateToSubCategory) {
-            this.navigateToNextSubCategory();
+        if (shouldNavigateToNextRanking && activePlaylist) {
+            this.navigateToNextPlaylistRanking(activePlaylist);
         } else if (nextIndex !== -1) {
             // Save state and refresh to play next item
             this.saveAndRefreshForNextVideo(nextIndex);
+        }
+    }
+
+    getActivePlaylist() {
+        const playlistData = localStorage.getItem('activePlaylist');
+        return playlistData ? JSON.parse(playlistData) : null;
+    }
+
+    navigateToNextPlaylistRanking(playlist) {
+        // Move to next ranking in playlist
+        playlist.currentRankingIndex++;
+
+        // Loop back to start if reached end
+        if (playlist.currentRankingIndex >= playlist.rankings.length) {
+            playlist.currentRankingIndex = 0;
+        }
+
+        // Reset played indices for new ranking
+        playlist.playedIndices = [];
+
+        // Save updated playlist state
+        localStorage.setItem('activePlaylist', JSON.stringify(playlist));
+
+        // Navigate to next ranking
+        const nextRanking = playlist.rankings[playlist.currentRankingIndex];
+        const rankingUrls = {
+            'animeOST': 'anime-ost.html',
+            'animeEnding': 'anime-ending.html',
+            'animeOpening': 'anime-opening.html',
+            'christmasMovies': 'christmas-movies.html',
+            'disneySongs': 'disney-songs.html',
+            'topMovies': 'top-movies.html',
+            'topMovieSongs': 'top-movie-songs.html',
+            'topVideoGames': 'top-videogames.html',
+            'topVideoGamesMusic': 'top-videogames-music.html'
+        };
+
+        const url = rankingUrls[nextRanking.id];
+        if (url) {
+            window.location.href = url;
         }
     }
 
