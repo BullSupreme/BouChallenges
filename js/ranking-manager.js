@@ -1,6 +1,14 @@
 // Generic Ranking Manager - Works for all challenge types
 // Usage: Update the storageKey and challengeType based on your specific challenge
 
+// Load YouTube IFrame API
+(function() {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+})();
+
 class RankingManager {
     constructor(storageKey = 'rankingData', challengeType = 'generic') {
         this.storageKey = storageKey;
@@ -78,6 +86,8 @@ class RankingManager {
         const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
         let title = 'YouTube Video';
+        let duration = '';
+
         try {
             const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
             const response = await fetch(oembedUrl);
@@ -89,6 +99,13 @@ class RankingManager {
             console.log('Could not fetch YouTube title via oEmbed, using default');
         }
 
+        // Fetch duration using YouTube IFrame Player API
+        try {
+            duration = await this.getYouTubeDuration(videoId);
+        } catch (error) {
+            console.log('Could not fetch duration:', error);
+        }
+
         return {
             platform: 'YouTube',
             title: title,
@@ -96,7 +113,80 @@ class RankingManager {
             thumbnailUrl: thumbnailUrl,
             url: url,
             videoId: videoId,
+            duration: duration,
         };
+    }
+
+    getYouTubeDuration(videoId) {
+        return new Promise((resolve, reject) => {
+            // Check if YouTube IFrame API is loaded
+            if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+                console.log('YouTube IFrame API not loaded yet');
+                resolve(''); // Return empty string if API not available
+                return;
+            }
+
+            // Create temporary hidden div for the player
+            const tempDiv = document.createElement('div');
+            tempDiv.id = `temp-player-${videoId}-${Date.now()}`;
+            tempDiv.style.display = 'none';
+            document.body.appendChild(tempDiv);
+
+            let player = new YT.Player(tempDiv.id, {
+                height: '0',
+                width: '0',
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 0,
+                    'controls': 0
+                },
+                events: {
+                    'onReady': (event) => {
+                        const durationSeconds = event.target.getDuration();
+                        const formatted = this.formatDuration(Math.floor(durationSeconds));
+
+                        // Clean up
+                        event.target.destroy();
+                        document.body.removeChild(tempDiv);
+
+                        resolve(formatted);
+                    },
+                    'onError': (event) => {
+                        // Clean up on error
+                        try {
+                            event.target.destroy();
+                            document.body.removeChild(tempDiv);
+                        } catch (e) {}
+                        resolve(''); // Return empty string on error
+                    }
+                }
+            });
+
+            // Timeout after 10 seconds
+            setTimeout(() => {
+                try {
+                    if (player && player.destroy) {
+                        player.destroy();
+                    }
+                    if (document.body.contains(tempDiv)) {
+                        document.body.removeChild(tempDiv);
+                    }
+                } catch (e) {}
+                resolve('');
+            }, 10000);
+        });
+    }
+
+    formatDuration(seconds) {
+        if (!seconds) return '';
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+
+        if (hours > 0) {
+            return `${hours}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+        return `${minutes}:${String(secs).padStart(2, '0')}`;
     }
 
     async getSpotifyData(url) {
@@ -613,6 +703,7 @@ class RankingManager {
         `;
 
         const expandedClass = isPlayingVideo ? 'youtube-expanded' : '';
+        const durationDisplay = item.duration ? `<div class="song-duration">⏱️ ${this.escapeHtml(item.duration)}</div>` : '';
         return `
             <div class="song-item ${rankColor} ${expandedClass}" data-item-index="${index}" draggable="true">
                 <div class="rank-controls">
@@ -626,6 +717,7 @@ class RankingManager {
                         ${this.escapeHtml(displayText)}
                         ${externalButton}
                     </div>
+                    ${durationDisplay}
                     <input type="text" class="song-url-input" placeholder="YouTube or Spotify URL" value="${this.escapeHtml(item.url || '')}">
                 </div>
                 <button class="remove-btn" data-index="${index}">×</button>
