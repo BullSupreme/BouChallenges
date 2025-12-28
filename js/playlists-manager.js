@@ -20,37 +20,53 @@ class PlaylistsManager {
     }
 
     setupModalEventListeners() {
-        // Tab switching
-        const personalTab = document.getElementById('personalTab');
-        const communityTab = document.getElementById('communityTab');
-        const personalSection = document.getElementById('personalRankingsSection');
-        const communitySection = document.getElementById('communityRankingsSection');
+        // Use setTimeout to ensure DOM is ready
+        setTimeout(() => {
+            // Tab switching
+            const personalTab = document.getElementById('personalTab');
+            const communityTab = document.getElementById('communityTab');
+            const personalSection = document.getElementById('personalRankingsSection');
+            const communitySection = document.getElementById('communityRankingsSection');
 
-        if (personalTab && communityTab) {
-            personalTab.addEventListener('click', () => {
-                personalSection.style.display = 'block';
-                communitySection.style.display = 'none';
-                personalTab.className = 'btn btn-primary';
-                personalTab.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                communityTab.className = 'btn btn-secondary';
-                communityTab.style.background = '';
-            });
+            console.log('Setting up tab listeners:', { personalTab, communityTab });
 
-            communityTab.addEventListener('click', () => {
-                personalSection.style.display = 'none';
-                communitySection.style.display = 'block';
-                communityTab.className = 'btn btn-primary';
-                communityTab.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
-                personalTab.className = 'btn btn-secondary';
-                personalTab.style.background = '';
-            });
-        }
+            if (personalTab && communityTab && personalSection && communitySection) {
+                // Remove any existing listeners by cloning
+                const newPersonalTab = personalTab.cloneNode(true);
+                const newCommunityTab = communityTab.cloneNode(true);
+                personalTab.parentNode.replaceChild(newPersonalTab, personalTab);
+                communityTab.parentNode.replaceChild(newCommunityTab, communityTab);
 
-        // File import handling
-        const importFile = document.getElementById('importRankingFile');
-        if (importFile) {
-            importFile.addEventListener('change', (e) => this.handleFileImport(e));
-        }
+                newPersonalTab.addEventListener('click', () => {
+                    console.log('Personal tab clicked');
+                    personalSection.style.display = 'block';
+                    communitySection.style.display = 'none';
+                    newPersonalTab.className = 'btn btn-primary';
+                    newPersonalTab.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    newCommunityTab.className = 'btn btn-secondary';
+                    newCommunityTab.style.background = '';
+                });
+
+                newCommunityTab.addEventListener('click', () => {
+                    console.log('Community tab clicked');
+                    personalSection.style.display = 'none';
+                    communitySection.style.display = 'block';
+                    newCommunityTab.className = 'btn btn-primary';
+                    newCommunityTab.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    newPersonalTab.className = 'btn btn-secondary';
+                    newPersonalTab.style.background = '';
+                    this.renderImportedRankings();
+                });
+            } else {
+                console.error('Tab elements not found:', { personalTab, communityTab, personalSection, communitySection });
+            }
+
+            // File import handling
+            const importFile = document.getElementById('importRankingFile');
+            if (importFile) {
+                importFile.addEventListener('change', (e) => this.handleFileImport(e));
+            }
+        }, 100);
     }
 
     openCreateModal() {
