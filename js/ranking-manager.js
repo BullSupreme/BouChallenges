@@ -20,6 +20,7 @@ class RankingManager {
         // Autoplay properties
         this.autoplayEnabled = false;
         this.shuffleEnabled = false;
+        this.subCategoryAutoplayEnabled = false;
         this.currentPlayingIndex = null;
         this.countdownInterval = null;
         this.playedIndices = [];
@@ -48,6 +49,8 @@ class RankingManager {
         }
         // Setup autoplay controls
         this.setupAutoplayControls();
+        // Restore autoplay state if navigating from sub-category
+        this.restoreAutoplayState();
     }
 
     // Parse URL and extract metadata (YouTube/Spotify specific)
@@ -1912,6 +1915,7 @@ class RankingManager {
         autoplayContainer.innerHTML = `
             <button id="autoplayBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.9em; padding: 8px 14px;">▶ Autoplay</button>
             <button id="shuffleBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 0.9em; padding: 8px 14px;">🔀 Shuffle</button>
+            <button id="subCategoryBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 0.9em; padding: 8px 14px;">📂 Sub Categories</button>
         `;
 
         // Create refresh durations button at the bottom
@@ -1926,6 +1930,7 @@ class RankingManager {
         // Setup event listeners
         document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
         document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
+        document.getElementById('subCategoryBtn').addEventListener('click', () => this.toggleSubCategoryAutoplay());
         refreshBtn.addEventListener('click', () => this.refreshAllDurations());
     }
 
@@ -1995,6 +2000,21 @@ class RankingManager {
             btn.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
             btn.style.boxShadow = 'none';
             btn.textContent = '🔀 Shuffle';
+        }
+    }
+
+    toggleSubCategoryAutoplay() {
+        this.subCategoryAutoplayEnabled = !this.subCategoryAutoplayEnabled;
+        const btn = document.getElementById('subCategoryBtn');
+
+        if (this.subCategoryAutoplayEnabled) {
+            btn.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)';
+            btn.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.4)';
+            btn.textContent = '📂 Sub Categories ON';
+        } else {
+            btn.style.background = 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)';
+            btn.style.boxShadow = 'none';
+            btn.textContent = '📂 Sub Categories';
         }
     }
 
@@ -2114,9 +2134,15 @@ class RankingManager {
                 .filter(({ item, idx }) => item.url && item.platform === 'YouTube' && !this.playedIndices.includes(idx));
 
             if (youtubeItems.length === 0) {
-                // All played, reset
-                this.playedIndices = [];
-                nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+                // All played in current category
+                if (this.subCategoryAutoplayEnabled) {
+                    this.navigateToNextSubCategory();
+                    return;
+                } else {
+                    // Reset and loop current category
+                    this.playedIndices = [];
+                    nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+                }
             } else {
                 const randomItem = youtubeItems[Math.floor(Math.random() * youtubeItems.length)];
                 nextIndex = randomItem.idx;
@@ -2133,14 +2159,102 @@ class RankingManager {
                 nextIndex++;
             }
 
-            // Loop back to start if reached end
+            // Reached end of current category
             if (nextIndex >= this.items.length) {
-                nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+                if (this.subCategoryAutoplayEnabled) {
+                    this.navigateToNextSubCategory();
+                    return;
+                } else {
+                    // Loop back to start of current category
+                    nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+                }
             }
         }
 
         if (nextIndex !== -1) {
             this.playNextItem(nextIndex);
+        }
+    }
+
+    getSubCategoryNavigation() {
+        // Define sub-category navigation order
+        const subCategories = {
+            'animeOST': { next: 'pages/anime-ending.html', group: 'anime' },
+            'animeEnding': { next: 'pages/anime-opening.html', group: 'anime' },
+            'animeOpening': { next: 'pages/anime-ost.html', group: 'anime' },
+            'topMovies': { next: 'pages/top-movie-songs.html', group: 'movies' },
+            'topMovieSongs': { next: 'pages/top-movies.html', group: 'movies' },
+            'topVideoGames': { next: 'pages/top-videogames-music.html', group: 'videogames' },
+            'topVideoGamesMusic': { next: 'pages/top-videogames.html', group: 'videogames' }
+        };
+
+        return subCategories[this.storageKey];
+    }
+
+    navigateToNextSubCategory() {
+        const navInfo = this.getSubCategoryNavigation();
+
+        if (!navInfo) {
+            // No sub-category navigation defined, loop current category
+            this.playedIndices = [];
+            const nextIndex = this.items.findIndex(item => item.url && item.platform === 'YouTube');
+            if (nextIndex !== -1) {
+                this.playNextItem(nextIndex);
+            }
+            return;
+        }
+
+        // Save autoplay state to localStorage
+        localStorage.setItem('autoplayState', JSON.stringify({
+            autoplayEnabled: true,
+            shuffleEnabled: this.shuffleEnabled,
+            subCategoryAutoplayEnabled: true
+        }));
+
+        // Navigate to next sub-category
+        window.location.href = navInfo.next;
+    }
+
+    restoreAutoplayState() {
+        const savedState = localStorage.getItem('autoplayState');
+        if (savedState) {
+            try {
+                const state = JSON.parse(savedState);
+                localStorage.removeItem('autoplayState'); // Clear after reading
+
+                if (state.autoplayEnabled) {
+                    // Restore autoplay settings
+                    this.shuffleEnabled = state.shuffleEnabled;
+                    this.subCategoryAutoplayEnabled = state.subCategoryAutoplayEnabled;
+
+                    // Update button states
+                    if (this.shuffleEnabled) {
+                        const shuffleBtn = document.getElementById('shuffleBtn');
+                        if (shuffleBtn) {
+                            shuffleBtn.style.background = 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)';
+                            shuffleBtn.style.boxShadow = '0 4px 12px rgba(168, 85, 247, 0.4)';
+                            shuffleBtn.textContent = '🔀 Shuffle ON';
+                        }
+                    }
+
+                    if (this.subCategoryAutoplayEnabled) {
+                        const subCategoryBtn = document.getElementById('subCategoryBtn');
+                        if (subCategoryBtn) {
+                            subCategoryBtn.style.background = 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)';
+                            subCategoryBtn.style.boxShadow = '0 4px 12px rgba(236, 72, 153, 0.4)';
+                            subCategoryBtn.textContent = '📂 Sub Categories ON';
+                        }
+                    }
+
+                    // Start autoplay after a short delay
+                    setTimeout(() => {
+                        this.toggleAutoplay();
+                    }, 500);
+                }
+            } catch (error) {
+                console.log('Could not restore autoplay state:', error);
+                localStorage.removeItem('autoplayState');
+            }
         }
     }
 }
