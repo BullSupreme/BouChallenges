@@ -21,11 +21,21 @@ class PlaylistsManager {
     openCreateModal() {
         this.currentEditingPlaylist = null;
         this.selectedRankings = [];
-        document.getElementById('modalTitle').textContent = 'Create Playlist';
-        document.getElementById('playlistNameInput').value = '';
+
+        const modal = document.getElementById('playlistModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const nameInput = document.getElementById('playlistNameInput');
+
+        if (!modal || !modalTitle || !nameInput) {
+            console.error('Modal elements not found');
+            return;
+        }
+
+        modalTitle.textContent = 'Create Playlist';
+        nameInput.value = '';
         this.renderAvailableRankings();
         this.updateSelectedRankings();
-        document.getElementById('playlistModal').style.display = 'flex';
+        modal.style.display = 'flex';
     }
 
     openEditModal(playlistId) {
@@ -34,21 +44,39 @@ class PlaylistsManager {
 
         this.currentEditingPlaylist = playlist;
         this.selectedRankings = [...playlist.rankings];
-        document.getElementById('modalTitle').textContent = 'Edit Playlist';
-        document.getElementById('playlistNameInput').value = playlist.name;
+
+        const modal = document.getElementById('playlistModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const nameInput = document.getElementById('playlistNameInput');
+
+        if (!modal || !modalTitle || !nameInput) {
+            console.error('Modal elements not found');
+            return;
+        }
+
+        modalTitle.textContent = 'Edit Playlist';
+        nameInput.value = playlist.name;
         this.renderAvailableRankings();
         this.updateSelectedRankings();
-        document.getElementById('playlistModal').style.display = 'flex';
+        modal.style.display = 'flex';
     }
 
     closeModal() {
-        document.getElementById('playlistModal').style.display = 'none';
+        const modal = document.getElementById('playlistModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
         this.currentEditingPlaylist = null;
         this.selectedRankings = [];
     }
 
     renderAvailableRankings() {
         const container = document.getElementById('availableRankings');
+
+        if (!container) {
+            console.error('availableRankings container not found');
+            return;
+        }
 
         // Define all available ranking categories
         const availableCategories = [
@@ -83,7 +111,10 @@ class PlaylistsManager {
             card.addEventListener('click', () => {
                 const id = card.dataset.id;
                 const type = card.dataset.type;
-                this.toggleRanking(id, type, card.querySelector('h4').textContent);
+                const h4 = card.querySelector('h4');
+                if (h4) {
+                    this.toggleRanking(id, type, h4.textContent);
+                }
             });
         });
     }
