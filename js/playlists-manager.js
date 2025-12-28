@@ -245,18 +245,27 @@ class PlaylistsManager {
 
     playPlaylist(playlistId) {
         const playlist = this.playlists.find(p => p.id === playlistId);
-        if (!playlist) return;
+        if (!playlist) {
+            console.error('Playlist not found:', playlistId);
+            return;
+        }
+
+        console.log('Playing playlist:', playlist);
 
         // Save playlist to be played
-        localStorage.setItem('activePlaylist', JSON.stringify({
+        const playlistData = {
             id: playlist.id,
             name: playlist.name,
             rankings: playlist.rankings,
             currentRankingIndex: 0,
             playedIndices: []
-        }));
+        };
+
+        console.log('Saving to localStorage:', playlistData);
+        localStorage.setItem('activePlaylist', JSON.stringify(playlistData));
 
         // Navigate to the playlist viewer page
+        console.log('Navigating to playlist-viewer.html');
         window.location.href = 'playlist-viewer.html';
     }
 
