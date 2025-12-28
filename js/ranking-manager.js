@@ -1199,12 +1199,35 @@ class RankingManager {
                 display: flex;
                 gap: 15px;
                 align-items: center;
-                cursor: pointer;
                 transition: all 0.3s ease;
+                margin-top: 15px;
             `;
-            indicator.onclick = () => {
+
+            // Create left side (clickable duplicate info)
+            const duplicateInfo = document.createElement('div');
+            duplicateInfo.id = 'duplicateInfo';
+            duplicateInfo.style.cssText = `
+                flex: 1;
+                cursor: pointer;
+                display: flex;
+                gap: 15px;
+                align-items: center;
+            `;
+            duplicateInfo.onclick = () => {
                 document.getElementById('duplicatesSection')?.scrollIntoView({ behavior: 'smooth' });
             };
+
+            // Create right side (autoplay controls container)
+            const autoplayContainer = document.createElement('div');
+            autoplayContainer.id = 'autoplayContainer';
+            autoplayContainer.style.cssText = `
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            `;
+
+            indicator.appendChild(duplicateInfo);
+            indicator.appendChild(autoplayContainer);
             header.appendChild(indicator);
         }
 
@@ -1232,26 +1255,26 @@ class RankingManager {
 
     updateDuplicateDisplay() {
         const duplicates = this.detectDuplicates();
-        const indicator = document.getElementById('duplicateIndicator');
+        const duplicateInfo = document.getElementById('duplicateInfo');
         const section = document.getElementById('duplicatesSection');
 
-        if (!indicator || !section) return;
+        if (!duplicateInfo || !section) return;
 
         const redCount = duplicates.filter(d => d.severity === 'red').length;
         const orangeCount = duplicates.filter(d => d.severity === 'orange').length;
         const yellowCount = duplicates.filter(d => d.severity === 'yellow').length;
 
-        // Update indicator
+        // Update duplicate info
         if (duplicates.length === 0) {
-            indicator.innerHTML = `<span style="color: #10b981; font-weight: 600;">✓ No duplicates detected</span>`;
+            duplicateInfo.innerHTML = `<span style="color: #10b981; font-weight: 600;">✓ No duplicates detected</span>`;
             section.style.display = 'none';
         } else {
-            indicator.innerHTML = `
+            duplicateInfo.innerHTML = `
                 <span style="color: #cbd5e1; font-weight: 600;">⚠ Potential Duplicates:</span>
                 ${redCount > 0 ? `<span style="background: #dc2626; color: white; padding: 4px 12px; border-radius: 5px; font-weight: 600;">${redCount} Exact</span>` : ''}
                 ${orangeCount > 0 ? `<span style="background: #ea580c; color: white; padding: 4px 12px; border-radius: 5px; font-weight: 600;">${orangeCount} Partial</span>` : ''}
                 ${yellowCount > 0 ? `<span style="background: #eab308; color: white; padding: 4px 12px; border-radius: 5px; font-weight: 600;">${yellowCount} Possible</span>` : ''}
-                <span style="color: #94a3b8; font-size: 0.9em; margin-left: auto;">Click to view details ↓</span>
+                <span style="color: #94a3b8; font-size: 0.9em;">Click to view details ↓</span>
             `;
             section.style.display = 'block';
 
@@ -1880,24 +1903,69 @@ class RankingManager {
 
     // Autoplay/Shuffle Feature
     setupAutoplayControls() {
+        const autoplayContainer = document.getElementById('autoplayContainer');
         const addRankBtn = document.getElementById('addRankBtn');
-        if (!addRankBtn) return;
 
-        const controlsContainer = addRankBtn.parentElement;
+        if (!autoplayContainer || !addRankBtn) return;
 
-        // Create autoplay controls
-        const autoplayControls = document.createElement('div');
-        autoplayControls.style.cssText = 'display: flex; gap: 10px; align-items: center;';
-        autoplayControls.innerHTML = `
-            <button id="autoplayBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">▶ Autoplay</button>
-            <button id="shuffleBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);">🔀 Shuffle</button>
+        // Create buttons in the top autoplay container
+        autoplayContainer.innerHTML = `
+            <button id="autoplayBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.9em; padding: 8px 14px;">▶ Autoplay</button>
+            <button id="shuffleBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 0.9em; padding: 8px 14px;">🔀 Shuffle</button>
         `;
 
-        controlsContainer.appendChild(autoplayControls);
+        // Create refresh durations button at the bottom
+        const controlsContainer = addRankBtn.parentElement;
+        const refreshBtn = document.createElement('button');
+        refreshBtn.id = 'refreshDurationsBtn';
+        refreshBtn.className = 'btn btn-primary';
+        refreshBtn.style.cssText = 'background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.9em;';
+        refreshBtn.textContent = '🔄 Refresh Durations';
+        controlsContainer.appendChild(refreshBtn);
 
         // Setup event listeners
         document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
         document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
+        refreshBtn.addEventListener('click', () => this.refreshAllDurations());
+    }
+
+    async refreshAllDurations() {
+        const btn = document.getElementById('refreshDurationsBtn');
+        const originalText = btn.textContent;
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Refreshing...';
+        btn.style.opacity = '0.6';
+
+        let updated = 0;
+        const youtubeItems = this.items.filter(item => item.url && item.platform === 'YouTube');
+
+        for (let i = 0; i < this.items.length; i++) {
+            const item = this.items[i];
+            if (item.url && item.platform === 'YouTube' && item.videoId) {
+                try {
+                    const duration = await this.getYouTubeDuration(item.videoId);
+                    if (duration) {
+                        this.items[i].duration = duration;
+                        updated++;
+                        btn.textContent = `⏳ ${updated}/${youtubeItems.length}...`;
+                    }
+                } catch (error) {
+                    console.log(`Could not fetch duration for ${item.title}:`, error);
+                }
+            }
+        }
+
+        this.saveItems();
+        this.renderItems();
+
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.textContent = `✓ Updated ${updated}`;
+
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
     }
 
     toggleAutoplay() {
