@@ -1931,17 +1931,32 @@ class RankingManager {
     }
 
     startAutoplay() {
-        // Find first item with URL or start from beginning
-        let startIndex = 0;
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].url && this.items[i].platform === 'YouTube') {
-                startIndex = i;
-                break;
+        this.playedIndices = [];
+        let startIndex = -1;
+
+        if (this.shuffleEnabled) {
+            // Shuffle mode: pick random YouTube video
+            const youtubeItems = this.items
+                .map((item, idx) => ({ item, idx }))
+                .filter(({ item }) => item.url && item.platform === 'YouTube');
+
+            if (youtubeItems.length > 0) {
+                const randomItem = youtubeItems[Math.floor(Math.random() * youtubeItems.length)];
+                startIndex = randomItem.idx;
+            }
+        } else {
+            // Normal mode: start from first YouTube video
+            for (let i = 0; i < this.items.length; i++) {
+                if (this.items[i].url && this.items[i].platform === 'YouTube') {
+                    startIndex = i;
+                    break;
+                }
             }
         }
 
-        this.playedIndices = [];
-        this.playNextItem(startIndex);
+        if (startIndex !== -1) {
+            this.playNextItem(startIndex);
+        }
     }
 
     stopAutoplay() {
