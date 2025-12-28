@@ -1907,31 +1907,22 @@ class RankingManager {
     // Autoplay/Shuffle Feature
     setupAutoplayControls() {
         const autoplayContainer = document.getElementById('autoplayContainer');
-        const addRankBtn = document.getElementById('addRankBtn');
 
-        if (!autoplayContainer || !addRankBtn) return;
+        if (!autoplayContainer) return;
 
-        // Create buttons in the top autoplay container
+        // Create buttons in the top autoplay container (including refresh durations)
         autoplayContainer.innerHTML = `
             <button id="autoplayBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 0.9em; padding: 8px 14px;">▶ Autoplay</button>
             <button id="shuffleBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 0.9em; padding: 8px 14px;">🔀 Shuffle</button>
             <button id="subCategoryBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 0.9em; padding: 8px 14px;">📂 Sub Categories</button>
+            <button id="refreshDurationsBtn" class="btn btn-primary" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.9em; padding: 8px 14px;">🔄 Refresh Durations</button>
         `;
-
-        // Create refresh durations button at the bottom
-        const controlsContainer = addRankBtn.parentElement;
-        const refreshBtn = document.createElement('button');
-        refreshBtn.id = 'refreshDurationsBtn';
-        refreshBtn.className = 'btn btn-primary';
-        refreshBtn.style.cssText = 'background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); font-size: 0.9em;';
-        refreshBtn.textContent = '🔄 Refresh Durations';
-        controlsContainer.appendChild(refreshBtn);
 
         // Setup event listeners
         document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
         document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
         document.getElementById('subCategoryBtn').addEventListener('click', () => this.toggleSubCategoryAutoplay());
-        refreshBtn.addEventListener('click', () => this.refreshAllDurations());
+        document.getElementById('refreshDurationsBtn').addEventListener('click', () => this.refreshAllDurations());
     }
 
     async refreshAllDurations() {
@@ -1982,9 +1973,9 @@ class RankingManager {
             btn.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
             this.startAutoplay();
         } else {
-            btn.textContent = '▶ Autoplay';
-            btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+            // Stop autoplay and refresh page to reset everything
             this.stopAutoplay();
+            window.location.reload();
         }
     }
 
