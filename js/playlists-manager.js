@@ -105,17 +105,15 @@ class PlaylistsManager {
 
     updateSelectedRankings() {
         const container = document.getElementById('selectedRankings');
-        const emptyMessage = document.getElementById('emptyMessage');
         const countSpan = document.getElementById('selectedCount');
+
+        if (!container || !countSpan) return;
 
         countSpan.textContent = this.selectedRankings.length;
 
         if (this.selectedRankings.length === 0) {
-            emptyMessage.style.display = 'block';
-            container.querySelectorAll('.selected-item').forEach(item => item.remove());
+            container.innerHTML = '<p style="color: #64748b; text-align: center;" id="emptyMessage">No rankings selected</p>';
         } else {
-            emptyMessage.style.display = 'none';
-
             // Render selected rankings as tags
             container.innerHTML = this.selectedRankings.map((ranking, index) => `
                 <div class="selected-item" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-radius: 6px; margin: 5px; color: white; font-size: 0.9em;">
