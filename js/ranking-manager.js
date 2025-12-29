@@ -1916,7 +1916,6 @@ class RankingManager {
             <button id="nextBtn" class="btn btn-primary" title="Next Video" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">⏭️</button>
             <button id="autoplayBtn" class="btn btn-primary" title="Autoplay" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">▶️</button>
             <button id="shuffleBtn" class="btn btn-primary" title="Shuffle" style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">🔀</button>
-            <button id="playlistBtn" class="btn btn-primary" title="Playlists" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); font-size: 1.1em; padding: 6px 10px; min-width: unset;">📋</button>
         `;
 
         // Create refresh durations button in bottom controls container
@@ -1950,13 +1949,7 @@ class RankingManager {
         document.getElementById('nextBtn').addEventListener('click', () => this.skipToNext());
         document.getElementById('autoplayBtn').addEventListener('click', () => this.toggleAutoplay());
         document.getElementById('shuffleBtn').addEventListener('click', () => this.toggleShuffle());
-        document.getElementById('playlistBtn').addEventListener('click', () => this.openPlaylists());
         refreshBtn.addEventListener('click', () => this.refreshAllDurations());
-    }
-
-    openPlaylists() {
-        // Navigate to playlists page
-        window.location.href = '../pages/playlists.html';
     }
 
     skipToNext() {
